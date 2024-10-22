@@ -17,7 +17,7 @@ if ($_POST['funcion'] == 'crear') {
     $sexo = $_POST['sexo'];
     
     // Verificar si el cliente ya existe
-    if ($cliente->existeCliente($nombre, $email, $dni,$apellido) === false) {
+    if ($cliente->existeCliente($nombre, $email, $dni, $apellido) === false) {
         $cliente->crear($nombre, $apellido, $email, $telefono, $direccion, $avatar, $dni, $edad, $sexo);
         echo 'add'; // Cliente creado
     } else {
