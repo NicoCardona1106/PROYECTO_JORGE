@@ -26,6 +26,32 @@ if ($_POST['funcion'] == 'crear') {
 }
 
 //-------------------------------------------------------------------
+// Funcion para buscar un producto
+//-------------------------------------------------------------------
+if ($_POST['funcion'] == 'buscar'){
+    $json = Array();
+    // Llamado al controlador
+    $producto->Buscar($_POST['dato']);
+    foreach ($proveedor->objetos as $objeto) {
+        $json[]=array(
+            'id_proveedor'=>$objeto->id_proveedor,
+            'nombre'=>$objeto->nombre,
+            'apellido'=>$objeto->apellido,
+            'dni'=>$objeto->dni,
+            'edad'=>$objeto->edad,
+            'sexo'=>$objeto->sexo,
+            'correo'=>$objeto->correo,
+            'telefono'=>$objeto->telefono,
+            'direccion'=>$objeto->direccion,
+            'avatar'=>$objeto->avatar
+            
+        );
+    }
+    $jsonstring = json_encode($json[0]);
+    echo $jsonstring;
+}
+
+//-------------------------------------------------------------------
 // Función Listar
 //-------------------------------------------------------------------
 if ($_POST['funcion'] == 'listar') {

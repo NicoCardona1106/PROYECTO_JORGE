@@ -54,6 +54,32 @@ $(document).ready(function() {
         edit = true; // Establecer modo de edición
         $('#tit_ven').text('Editar Proveedor'); // Cambiar el título del modal
     });
+
+    //-------------------------------------------------------------
+    //Buscar 
+    //-------------------------------------------------------------
+    function buscar(dato) {
+        funcion = 'buscar';
+        $.post('../controlador/ProveedorController.php',{dato, funcion},(response)=>{
+            const respuesta = JSON.parse(response);
+            $('#id').val(respuesta.id_proveedor);
+            $('#nombre').val(respuesta.nombre);
+            $('#apellido').val(respuesta.apellido);
+            $('#dni').val(respuesta.dni);
+            $('#edad').val(respuesta.edad);
+            $('#sexo').val(respuesta.sexo).trigger('change');
+            $('#correo').val(respuesta.correo).trigger('change');
+            $('#telefono').val(respuesta.telefono).trigger('change');
+            $('#direccion').val(respuesta.direccion).trigger('change');
+            $('#avatar').val(respuesta.avatar).trigger('change');
+
+            ///CAMBIO LOGO
+            $('#nombre_avatar').html(respuesta.nombre);       //Nombre Producto
+            $('#id_avatar').val(respuesta.id);                //Id del prodcuto en la ventana modal cambio logo
+            $('#avataractual').attr('src','../assets/img/proveedor/'+respuesta.avatar);  //Logo actual
+        })
+    };
+
     
 
     // Evento para restablecer el formulario al cerrar el modal
@@ -110,7 +136,7 @@ $(document).ready(function() {
                         <button class="borrar btn btn-danger">
                             <i class="fas fa-trash-alt"></i>
                         </button>
-                        
+
                         `
                         
                 }
