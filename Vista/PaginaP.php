@@ -25,6 +25,7 @@ if ($_SESSION['id_tipo_us'] == 3) { // Asegúrate de ajustar esto según el rol 
       </div><!-- /.container-fluid -->
     </section>
 
+    
     <!------------------ Main content ------------------------------->  
     <section class="content">
       <div class="row">
