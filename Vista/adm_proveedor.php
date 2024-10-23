@@ -105,6 +105,51 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
             </div>
         </section>
 
+<!-------------------------------------------------->
+<!--   Ventana Modal para el cambio de logo     -->
+<!-------------------------------------------------->
+<div class="modal fade" id="cambiaravatar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Cambiar logo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+            <img id="avataractual" src="" class="profile-user-img img-fluid img-circle">
+          </div>
+          <div class="text-center">
+            <b id="nombre_avatar"></b>
+          </div>
+          <div class="alert alert-success text-center" id="updatelogo" style='display:none;'>
+            <i class="fa fa-check-circle m-1"> Se cambio la imagen</i>
+          </div>
+          <div class="alert alert-danger text-center" id="noupdatelogo" style='display:none;'>
+            <i class="fa fa-times-circle m-1"> Formato de imagen incorrecto</i>
+          </div>
+          <form id="form-logo" enctype="multipart/form-data">
+            <div class="input-group mb-3 ml-5">
+              <input type="file" name="photo" class="input-group">
+              <input type="hidden" name="funcion" id="funcion">
+              <input type="hidden" name="id_avatar" id="id_avatar">
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn bg-gradient-primary">Cambiar imagen</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-------------------------------------------------->
+<!-- FIN Ventana Modal para el cambio de logo   -->
+<!-------------------------------------------------->
+
         <!------------------ Main content ------------------------------> 
         <section class="content">
             <div class="row">
@@ -141,6 +186,8 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
         </section>
     </div> <!-- /.container-fluid -->
 </div>
+
+
 
 <?php
     include_once 'layouts/footer.php';
