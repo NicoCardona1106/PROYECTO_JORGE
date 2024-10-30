@@ -54,32 +54,6 @@ $(document).ready(function() {
         edit = true; // Establecer modo de edición
         $('#tit_ven').text('Editar Proveedor'); // Cambiar el título del modal
     });
-
-    //-------------------------------------------------------------
-    //Buscar 
-    //-------------------------------------------------------------
-    function buscar(dato) {
-        funcion = 'buscar';
-        $.post('../controlador/ProveedorController.php',{dato, funcion},(response)=>{
-            const respuesta = JSON.parse(response);
-            $('#id').val(respuesta.id_proveedor);
-            $('#nombre').val(respuesta.nombre);
-            $('#apellido').val(respuesta.apellido);
-            $('#dni').val(respuesta.dni);
-            $('#edad').val(respuesta.edad);
-            $('#sexo').val(respuesta.sexo).trigger('change');
-            $('#correo').val(respuesta.correo).trigger('change');
-            $('#telefono').val(respuesta.telefono).trigger('change');
-            $('#direccion').val(respuesta.direccion).trigger('change');
-            $('#avatar').val(respuesta.avatar).trigger('change');
-
-            ///CAMBIO LOGO
-            $('#nombre_avatar').html(respuesta.nombre);       //Nombre Producto
-            $('#id_avatar').val(respuesta.id);                //Id del prodcuto en la ventana modal cambio logo
-            $('#avataractual').attr('src','../assets/img/proveedor/'+respuesta.avatar);  //Logo actual
-        })
-    };
-
     
 
     // Evento para restablecer el formulario al cerrar el modal
@@ -127,18 +101,12 @@ $(document).ready(function() {
                 { "data": "avatar" }, // Columna para avatar
                 {
                     "defaultContent": `
-                        <button class='avatar btn bg-teal btn-sm' title='Cambiar imagen' data-toggle='modal' data-target='#cambiaravatar'>
-                            <i class='fas fa-image'></i>
-                        </button>
                         <button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#crear">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="borrar btn btn-danger">
                             <i class="fas fa-trash-alt"></i>
-                        </button>
-
-                        `
-                        
+                        </button>`
                 }
             ],
             "language": {
@@ -146,56 +114,6 @@ $(document).ready(function() {
             }
         });
     }
-
-    //----------------------------------------------------------
-    // Funcion que evalua click en CAMBIAR LOGO y obtiene el id
-    //----------------------------------------------------------
-    $(document).on('click','.avatar',function(){
-        if(tabla.row(this).child.isShown())
-            var data = tabla.row(this).data();
-        else
-            var data = tabla.row($(this).parents("tr")).data();
-        
-        const id = data.id; //capturo el ID	            
-        //Cargo los objetos ocultos obtenidos con javascript y enviarlos al controlador
-        buscar(id);
-        funcion = 'cambiar_logo';
-        $('#funcion').val(funcion);
-    });
-    
-    //----------------------------------------------------------
-    // Click en submit Cambiar logo
-    //---------------------------------------------------------
-    $('#form-logo').submit(e=>{
-        let formData = new FormData($('#form-logo')[0]);
-        $.ajax({
-            url:'../controlador/ProveedorController.php',
-            type:'POST',
-            data:formData,
-            cache:false,
-            processData:false,
-            contentType:false
-        }).done(function(response){
-
-            console.log(response);
-            const json= JSON.parse(response);
-            if(json.alert == 'editalogo'){
-                $('#avataractual').attr('src',json.ruta);
-                $('#updatelogo').hide('slow');
-                $('#updatelogo').show(1000);
-                $('#updatelogo').hide(2000);
-                //$('#form-logo').trigger('reset');
-                buscar_todos();
-            }
-            else{
-                $('#noupdatelogo').hide('slow');
-                $('#noupdatelogo').show(1000);
-                $('#noupdatelogo').hide(2000);
-                //$('#form-logo').trigger('reset');
-            }
-        });
-        e.preventDefault();
-    });
 
     listar(); // Llamada a la función para listar proveedores
 });

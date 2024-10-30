@@ -30,10 +30,13 @@ class Usuario {
     }
 
     // Función para crear un nuevo usuario
-    function crear($nombre, $apellido, $dni, $edad, $contrasena, $telefono, $direccion, $correo, $sexo, $infoadicional, $avatar) {
+    function crear($nombre, $apellido, $dni, $edad, $contrasena, $telefono, $direccion, $correo, $sexo, $infoadicional, $avatar, $id_tipo_us) {
+        // Verificación del avatar: si está vacío, se asigna 'default.png'
+        $avatar = !empty($avatar) ? $avatar : 'default.png';
+
         // Consulta SQL para insertar un nuevo usuario en la base de datos
-        $sql = "INSERT INTO usuario(nombre_us, apellido_us, dni_us, edad, contrasena_us, telefono_us, direccion_us, correo_us, sexo_us, info_adicional, avatar) 
-                VALUES (:nombre, :apellido, :dni, :edad, :contrasena, :telefono, :direccion, :correo, :sexo, :infoadicional, :avatar)";
+        $sql = "INSERT INTO usuario(nombre_us, apellidos_us, dni_us, edad_us, contrasena_us, telefono_us, direccion_us, correo_us, sexo_us, infoadicional_us, avatar, id_tipo_us) 
+                VALUES (:nombre, :apellido, :dni, :edad, :contrasena, :telefono, :direccion, :correo, :sexo, :infoadicional, :avatar, :id_tipo_us)";
         
         // Preparamos la consulta SQL
         $query = $this->acceso->prepare($sql);
@@ -45,13 +48,14 @@ class Usuario {
             ':dni' => $dni,
             ':edad' => $edad,
             // La contraseña se encripta antes de almacenarla en la base de datos
-            ':contrasena' => password_hash($contrasena, PASSWORD_DEFAULT),
+            ':contrasena' => $contrasena,
             ':telefono' => $telefono,
             ':direccion' => $direccion,
             ':correo' => $correo,
             ':sexo' => $sexo,
             ':infoadicional' => $infoadicional,
-            ':avatar' => $avatar  // La imagen del avatar también se almacena
+            ':avatar' => $avatar, // La imagen del avatar también se almacena
+            ':id_tipo_us' => $id_tipo_us 
         ));
         
         // Devolvemos el ID del último registro insertado en la base de datos

@@ -91,6 +91,7 @@ else{
   </div>
 </div>
 
+<!-- Modal para crear cuenta -->
 <div class="modal fade" id="crearCuentaModal" tabindex="-1" role="dialog" aria-labelledby="crearCuentaModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -117,7 +118,7 @@ else{
           </div>
           <div class="form-group">
             <label for="edad">Edad</label>
-            <input type="number" class="form-control" id="edad" name="edad" required>
+            <input type="date" class="form-control" id="edad" name="edad" required>
           </div>
           <div class="form-group">
             <label for="contrasena">Contraseña</label>
@@ -139,9 +140,9 @@ else{
             <label for="sexo">Sexo</label>
             <select class="form-control" id="sexo" name="sexo" required>
               <option value="">Seleccionar</option>
-              <option value="M">Masculino</option>
-              <option value="F">Femenino</option>
-              <option value="O">Otro</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Femenino">Femenino</option>
+              <option value="Otro">Otro</option>
             </select>
           </div>
           <div class="form-group">
@@ -168,43 +169,76 @@ else{
 <script src="../assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="../assets/js/adminlte.min.js"></script>
+
 <script>
 $(document).ready(function() {
+  // Mostrar modal de crear cuenta de cliente
   $('#btn-crear-cliente').click(function() {
     $('#tipoUsuario').val('cliente');
     $('#crearCuentaModalLabel').text('Crear Cuenta de Cliente');
     $('#crearCuentaModal').modal('show');
   });
 
+  // Mostrar modal de crear cuenta de proveedor
   $('#btn-crear-proveedor').click(function() {
     $('#tipoUsuario').val('proveedor');
     $('#crearCuentaModalLabel').text('Crear Cuenta de Proveedor');
     $('#crearCuentaModal').modal('show');
   });
 
+  // Enviar los datos del formulario de creación de cuenta mediante AJAX a UsuarioController y RegistroController
   $('#btnGuardarCuenta').click(function() {
     var formData = new FormData($('#formCrearCuenta')[0]);
+    
+    // Primera parte: Enviar los datos a UsuarioController.php para crear el usuario
     $.ajax({
-      url: '../controlador/RegistroController.php',
+      url: '../controlador/UsuarioController.php',
       type: 'POST',
       data: formData,
       contentType: false,
       processData: false,
       success: function(response) {
-        if(response == 'success') {
-          alert('Cuenta creada correctamente');
-          location.reload();
-        } else {
-          alert('Hubo un problema al crear la cuenta');
+        var resultado = JSON.parse(response);
+        if (resultado.status === 'success') {
+          console.log("Usuario creado exitosamente: ", resultado);
+          Swal.fire({
+                  icon: 'success',
+                  title: 'Cuenta creada',
+                  text: 'Tu cuenta ha sido creada exitosamente.',
+                  showConfirmButton: false,
+                  timer: 1500
+                }).then(() => {
+                  location.reload();
+                });
+        } else if (resultado.status === 'error') {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: resultado.message,
+            showConfirmButton: true,
+          });
+        } else if (resultado.status === 'exists') {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Usuario Existente',
+            text: resultado.message,
+            showConfirmButton: true,
+          });
         }
       },
       error: function() {
-        alert('Hubo un problema de conexión');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error de Conexión',
+          text: 'Hubo un problema de conexión con el usuario.',
+          showConfirmButton: true,
+        });
       }
     });
   });
 });
 </script>
+
 </body>
 </html>
 <?php

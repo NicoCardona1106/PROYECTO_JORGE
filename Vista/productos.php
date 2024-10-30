@@ -1,6 +1,6 @@
 <?php
 session_start();
-if ($_SESSION['id_tipo_us'] == 2) {
+if ($_SESSION['id_tipo_us'] == 2 | $_SESSION['id_tipo_us'] == 4) {
   $titulo_pag = 'Bienvenido a la sección de productos';
   include_once 'layouts/header.php';
   include_once 'layouts/navCliente.php';

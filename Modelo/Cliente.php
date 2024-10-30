@@ -9,6 +9,26 @@ class Cliente {
         $this->acceso = $db->pdo;
     }
 
+    // Método para crear un cliente desde un usuario
+    function crearDesdeUsuario($id_usuario, $nombre, $apellido, $email, $telefono, $direccion, $avatar, $dni, $edad, $sexo) {
+        $sql = "INSERT INTO clientes(nombre, apellido, email, telefono, direccion, avatar, dni, edad, sexo, id_usuario) 
+                            VALUES (:nombre, :apellido, :email, :telefono, :direccion, :avatar, :dni, :edad, :sexo, :id_usuario)";
+        $query = $this->acceso->prepare($sql);
+        $resultado = $query->execute(array(
+            ':nombre' => $nombre,
+            ':apellido' => $apellido,
+            ':email' => $email,
+            ':telefono' => $telefono,
+            ':direccion' => $direccion,
+            ':avatar' => $avatar,
+            ':dni' => $dni,
+            ':edad' => $edad,
+            ':sexo' => $sexo,
+            ':id_usuario' => $id_usuario
+        ));
+        return $resultado;
+    }
+
     // Método para crear un cliente
     function crear($nombre, $apellido, $email, $telefono, $direccion, $avatar, $dni, $edad, $sexo) {
         $sql = "INSERT INTO clientes(nombre, apellido, email, telefono, direccion, avatar, dni, edad, sexo) 
@@ -97,5 +117,7 @@ class Cliente {
         // Si hay algún resultado, el cliente ya existe
         return $stmt->rowCount() > 0;
     }
+
+
 }
 ?>

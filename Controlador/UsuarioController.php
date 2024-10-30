@@ -21,9 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $infoadicional = $_POST['infoadicional'];
     
     // Manejo del avatar
-    $avatar = null;
+    $avatar = 'default.png';  // Valor por defecto
     if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
-        // Para almacenar la ruta del avatar en lugar de su contenido
+        // Si se carga una imagen, se usa la ruta de la imagen cargada
         $avatar = 'path/to/avatar/' . basename($_FILES['avatar']['name']);
         move_uploaded_file($_FILES['avatar']['tmp_name'], '../assets/img/avatars/' . basename($_FILES['avatar']['name']));
     }
@@ -34,8 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
-    // Crear usuario
-    $id_usuario = $usuario->crear($nombre, $apellido, $dni, $edad, $contrasena, $telefono, $direccion, $correo, $sexo, $infoadicional, $avatar);
+    // Asignar id_tipo_us basado en el tipo de usuario (cliente o proveedor)
+    if ($tipoUsuario == 'cliente') {
+        $id_tipo_us = 2;  // Cliente
+    } else if ($tipoUsuario == 'proveedor') {
+        $id_tipo_us = 3;  // Proveedor
+    }
+
+    // Crear usuario con id_tipo_us
+    $id_usuario = $usuario->crear($nombre, $apellido, $dni, $edad, $contrasena, $telefono, $direccion, $correo, $sexo, $infoadicional, $avatar, $id_tipo_us);
 
     if ($id_usuario) {
         // Crear cliente o proveedor según corresponda
