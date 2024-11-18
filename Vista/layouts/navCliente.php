@@ -11,6 +11,11 @@
       <li class="nav-item d-none d-sm-inline-block">
         <a href="adm_contactos.php" class="nav-link">Contactar</a>
       </li>
+      <li class="nav-item">
+    <a class="nav-link" href="carrito.php">
+        <i class="fas fa-shopping-cart"></i> Carrito
+    </a>
+</li>
     </ul>
 
     <!-- Right navbar links -->

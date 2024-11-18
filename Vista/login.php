@@ -14,32 +14,28 @@
 
   <!-- Estilo personalizado para agregar la imagen de fondo -->
   <style>
-  body {
-    background-image: url("../assets/img/Fondos/Login.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 100vh;
-  }
-  .login-box {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 20px;
-    border-radius: 10px;
-  }
-  
-  .btn-block {
-    margin-bottom: 10px; /* Ajusta el valor según el espacio que necesites */
-  }
+    body {
+      background-image: url("../assets/img/Fondos/Login.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+    }
+    .login-box {
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .btn-block {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
-
 <?php
 session_start();
-
-if (!empty($_SESSION['id_tipo_us'])){ 	
+if (!empty($_SESSION['id_tipo_us'])) { 	
     header('location: ../controlador/LoginController.php');
-}
-else{
+} else {
     session_destroy();
 ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -51,7 +47,6 @@ else{
     </div>
     <div class="card-body">
       <p class="login-box-msg">Inicio de sesión</p>
-
       <form action="../controlador/LoginController.php" method="post">
         <div class="input-group mb-3">
           <input type="text" name="dni_us" id="dni_us" class="form-control" placeholder="Usuario">
@@ -106,35 +101,35 @@ else{
           <input type="hidden" id="tipoUsuario" name="tipoUsuario">
           <div class="form-group">
             <label for="nombre">Nombre</label>
-            <input type="text" class="form-control" id="nombre" name="nombre" required>
+            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese el Nombre" required>
           </div>
           <div class="form-group">
             <label for="apellido">Apellido</label>
-            <input type="text" class="form-control" id="apellido" name="apellido" required>
+            <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingrese el Apellido" required>
           </div>
           <div class="form-group">
             <label for="dni">DNI</label>
-            <input type="text" class="form-control" id="dni" name="dni" required>
+            <input type="number" class="form-control" id="dni" name="dni" placeholder="Ingrese el DNI" required>
           </div>
           <div class="form-group">
             <label for="edad">Edad</label>
-            <input type="date" class="form-control" id="edad" name="edad" required>
+            <input type="date" class="form-control" id="edad" name="edad" placeholder="Ingrese la edad" required>
           </div>
           <div class="form-group">
             <label for="contrasena">Contraseña</label>
-            <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+            <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="Ingrese la Contraseña" required>
           </div>
           <div class="form-group">
             <label for="telefono">Teléfono</label>
-            <input type="tel" class="form-control" id="telefono" name="telefono" required>
+            <input type="number" class="form-control" id="telefono" name="telefono" placeholder="Ingrese el Teléfono" required>
           </div>
           <div class="form-group">
             <label for="direccion">Dirección</label>
-            <input type="text" class="form-control" id="direccion" name="direccion" required>
+            <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Ingrese la Dirección" required>
           </div>
           <div class="form-group">
             <label for="correo">Correo</label>
-            <input type="email" class="form-control" id="correo" name="correo" required>
+            <input type="email" class="form-control" id="correo" name="correo" placeholder="Ingrese el Correo" required>
           </div>
           <div class="form-group">
             <label for="sexo">Sexo</label>
@@ -147,7 +142,7 @@ else{
           </div>
           <div class="form-group">
             <label for="infoadicional">Información Adicional</label>
-            <textarea class="form-control" id="infoadicional" name="infoadicional" rows="3"></textarea>
+            <textarea class="form-control" id="infoadicional" name="infoadicional" placeholder="Ingrese la informacion adicional" rows="3"></textarea>
           </div>
           <div class="form-group">
             <label for="avatar">Avatar</label>
@@ -171,74 +166,112 @@ else{
 <script src="../assets/js/adminlte.min.js"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Detecta el parámetro "error" en la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('error')) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Credenciales Incorrectas',
+      text: 'El usuario o la contraseña son incorrectos. Por favor, inténtalo nuevamente.',
+      confirmButtonText: 'Aceptar'
+    });
+  }
+});
+
 $(document).ready(function() {
-  // Mostrar modal de crear cuenta de cliente
   $('#btn-crear-cliente').click(function() {
     $('#tipoUsuario').val('cliente');
     $('#crearCuentaModalLabel').text('Crear Cuenta de Cliente');
     $('#crearCuentaModal').modal('show');
   });
 
-  // Mostrar modal de crear cuenta de proveedor
   $('#btn-crear-proveedor').click(function() {
     $('#tipoUsuario').val('proveedor');
     $('#crearCuentaModalLabel').text('Crear Cuenta de Proveedor');
     $('#crearCuentaModal').modal('show');
   });
 
-  // Enviar los datos del formulario de creación de cuenta mediante AJAX a UsuarioController y RegistroController
   $('#btnGuardarCuenta').click(function() {
-    var formData = new FormData($('#formCrearCuenta')[0]);
-    
-    // Primera parte: Enviar los datos a UsuarioController.php para crear el usuario
-    $.ajax({
-      url: '../controlador/UsuarioController.php',
-      type: 'POST',
-      data: formData,
-      contentType: false,
-      processData: false,
-      success: function(response) {
-        var resultado = JSON.parse(response);
-        if (resultado.status === 'success') {
-          console.log("Usuario creado exitosamente: ", resultado);
-          Swal.fire({
-                  icon: 'success',
-                  title: 'Cuenta creada',
-                  text: 'Tu cuenta ha sido creada exitosamente.',
-                  showConfirmButton: false,
-                  timer: 1500
-                }).then(() => {
-                  location.reload();
-                });
-        } else if (resultado.status === 'error') {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: resultado.message,
-            showConfirmButton: true,
-          });
-        } else if (resultado.status === 'exists') {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Usuario Existente',
-            text: resultado.message,
-            showConfirmButton: true,
-          });
-        }
-      },
-      error: function() {
+  var formData = new FormData($('#formCrearCuenta')[0]);
+  let isFormValid = true;
+
+  // Validación del campo de correo para verificar que contenga un @
+  const correo = $('#correo').val();
+  if (!correo.includes('@')) {
+    isFormValid = false;
+    $('#correo').addClass('is-invalid');
+    Swal.fire({
+      icon: 'error',
+      title: 'Correo no válido',
+      text: 'Por favor, ingresa un correo electrónico válido que incluya "@".',
+    });
+  } else {
+    $('#correo').removeClass('is-invalid');
+  }
+
+  $('#formCrearCuenta [required]').each(function() {
+    if ($(this).val() === "") {
+      isFormValid = false;
+      $(this).addClass('is-invalid');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Por favor, completa todos los campos requeridos.',
+      });
+    } else {
+      $(this).removeClass('is-invalid');
+    }
+  });
+
+  
+
+  if (!isFormValid) return;
+
+  // Ajax para enviar datos
+  $.ajax({
+    url: '../controlador/UsuarioController.php',
+    type: 'POST',
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function(response) {
+      var resultado = JSON.parse(response);
+      if (resultado.status === 'success') {
+        Swal.fire({
+          icon: 'success',
+          title: 'Cuenta creada',
+          text: 'Tu cuenta ha sido creada exitosamente.',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          location.reload();
+        });
+      } else if (resultado.status === 'error') {
         Swal.fire({
           icon: 'error',
-          title: 'Error de Conexión',
-          text: 'Hubo un problema de conexión con el usuario.',
-          showConfirmButton: true,
+          title: 'Error',
+          text: resultado.message,
+        });
+      } else if (resultado.status === 'exists') {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Usuario Existente',
+          text: resultado.message,
         });
       }
-    });
+    },
+    error: function() {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de Conexión',
+        text: 'Hubo un problema de conexión con el usuario.',
+      });
+    }
   });
 });
+});
 </script>
-
 </body>
 </html>
 <?php

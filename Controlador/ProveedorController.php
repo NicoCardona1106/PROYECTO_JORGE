@@ -2,6 +2,31 @@
 include_once '../modelo/Proveedor.php';
 $proveedor = new Proveedor();
 
+
+//-------------------------------------------------------------------
+// Funcion para buscar un producto
+//-------------------------------------------------------------------
+if ($_POST['funcion'] == 'buscar'){
+    $json = Array();
+    // Llamado al controlador
+    $proveedor->Buscar($_POST['dato']);
+    foreach ($proveedor->objetos as $objeto) {
+        $json[]=array(
+            'id'=>$objeto->id_proveedor,
+            'nombre'=>$objeto->nombre,
+            'apellido'=>$objeto->apellido,
+            'dni'=>$objeto->dni,
+            'edad'=>$objeto->edad,
+            'sexo'=>$objeto->sexo,
+            'correo'=>$objeto->correo,
+            'telefono'=>$objeto->telefono,
+            'direccion'=>$objeto->direccion,
+            'avatar'=>$objeto->avatar
+        );
+    }
+    $jsonstring = json_encode($json[0]);
+    echo $jsonstring;
+}
 //-------------------------------------------------------------------
 // Función Crear
 //-------------------------------------------------------------------
@@ -94,29 +119,31 @@ if ($_POST['funcion'] == 'cambiar_logo') {
         // Se obtiene el nombre del archivo
         $nombre = uniqid() . '-' . $_FILES['photo']['name'];
         // Concatenar el directorio con el nombre del archivo
-        $ruta = '../assets/img/proveedor/' . $nombre;
+        $ruta = '../assets/img/proveedor/'.$nombre;
         // Función PHP que sube la imagen al servidor
-        move_uploaded_file($_FILES['photo']['tmp_name'], $ruta);
-        $proveedor->CambiarLogo($_POST['id_avatar'], $nombre);
+        move_uploaded_file($_FILES['photo']['tmp_name'],$ruta);
+        $proveedor->CambiarLogo($_POST['id_avatar'],$nombre);
 
         foreach ($proveedor->objetos as $objeto) {
-            if ($objeto->avatar != 'default.png') {
-                unlink('../assets/img/proveedor/' . $objeto->avatar);
-            }
+            if ($objeto->avatar!='default.png')
+                unlink('../assets/img/proveedor/'.$objeto->avatar);
+            
         }
         // Retorno de un Json con dos valores 
         $json = array();
         $json[] = array(
             'ruta' => $ruta,
-            'alert' => 'editalogo'
+            'alert'=>'editalogo'
         );
-    } else {
+    } 
+    else {
         // En caso de una imagen con formato incorrecto
         $json = array();
         $json[] = array(
             'alert' => 'noeditalogo'
-        );
+            );
     }
-    echo json_encode($json[0]);
+    $jsonstring = json_encode($json[0]);
+    echo $jsonstring;
 }
 ?>

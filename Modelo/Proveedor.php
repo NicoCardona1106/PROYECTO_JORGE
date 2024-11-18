@@ -131,6 +131,25 @@ class Proveedor {
             return $this->objetos;
         }
 
-    // Otros métodos existentes...
-}
+        //--------------------------------
+        //Cambiar Avatar    
+        //--------------------------------
+        function CambiarLogo($id, $img){
+            //Consulta el nombre de la imagen antes de borrarla
+            $sql = 'SELECT avatar from proveedor WHERE id_proveedor = :id';        
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id'=>$id));
+            $this->objetos = $query->fetchall();
+            
+            //Actualiza la imagen
+            $sql = 'UPDATE proveedor SET avatar = :img WHERE id_proveedor = :id';
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id'=>$id,':img'=>$img));
+
+            //Retorna la imagen antigua
+            return $this->objetos;
+            
+        }
+
+    }
 ?>

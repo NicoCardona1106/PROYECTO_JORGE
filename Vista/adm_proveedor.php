@@ -85,6 +85,44 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
 </div>
 
 <!-------------------------------------------------------> 
+<!--   Ventana Modal para CAMBIAR LOGO (AVATAR)       -->
+<!-------------------------------------------------------> 
+<div class="modal fade" id="cambiaravatar" tabindex="-1" role="dialog" aria-labelledby="cambiarAvatarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cambiarAvatarLabel">Cambiar Avatar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <img id="avataractual" src="" class="profile-user-img img-fluid img-circle">
+                </div>
+                <div class="alert alert-success text-center" id="updatelogo" style='display:none;'>
+                    <i class="fa fa-check-circle m-1"> Imagen cambiada correctamente</i>
+                </div>
+                <div class="alert alert-danger text-center" id="noupdatelogo" style='display:none;'>
+                    <i class="fa fa-times-circle m-1"> Formato de imagen incorrecto</i>
+                </div>
+                <form id="form-logo" enctype="multipart/form-data">
+                    <div class="input-group mb-3">
+                        <input type="file" name="photo" class="form-control" required>
+                        <input type="hidden" name="funcion" id="funcion" value="cambiar_logo">
+                        <input type="hidden" name="id_avatar" id="id_avatar">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn bg-gradient-primary">Cambiar imagen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-------------------------------------------------------> 
 <!--   Tabla para listar los proveedores                  -->
 <!-------------------------------------------------------> 
 <div class="content-wrapper">

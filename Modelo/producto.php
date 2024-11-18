@@ -46,6 +46,29 @@
             return $this->objetos;    
         }
         
+        //--------------------------------
+        //Obtener Ultimo ID
+        //--------------------------------
+        public function ObtenerNuevoId() {
+            try {
+                $sql = "SELECT COALESCE(MAX(id_producto) + 1, 1) AS nuevoId FROM producto";
+                $query = $this->acceso->prepare($sql);
+                $query->execute();
+                $result = $query->fetch(PDO::FETCH_ASSOC);
+        
+                // Validar que la consulta retorne un valor válido
+                if ($result && isset($result['nuevoId'])) {
+                    return $result['nuevoId'];
+                } else {
+                    // Si no hay resultados, devolver 1 como valor por defecto
+                    return 1;
+                }
+            } catch (Exception $e) {
+                // Manejar errores
+                error_log("Error al obtener el nuevo ID: " . $e->getMessage());
+                return 1; // Valor por defecto en caso de error
+            }
+        }
         
         
         //-----------------------------------------------------------
@@ -152,6 +175,31 @@
             
         }
 
+
+        //--------------------------------
+        //Buscar Por Proveedor
+        //--------------------------------
+
+        public function BuscarPorProveedor($idProveedor) {
+            $sql = "SELECT id_producto, producto.nombre, concentracion, adicional, precio, producto.id_laboratorio,
+                            laboratorio.nombre as laboratorio, producto.id_tip_prod, tipo_producto.nombre as tipo, 
+                            producto.id_presentacion, presentacion.nombre as presentacion, producto.avatar
+                    FROM    producto 
+                    JOIN    laboratorio ON producto.id_laboratorio = laboratorio.id_laboratorio
+                    JOIN    tipo_producto ON producto.id_tip_prod = tipo_producto.id_tip_prod
+                    JOIN    presentacion ON producto.id_presentacion = presentacion.id_presentacion
+                    WHERE   producto.id_proveedor = :id_proveedor";
+            
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id_proveedor' => $idProveedor));
+            $this->objetos = $query->fetchAll(PDO::FETCH_OBJ);
+        
+            return $this->objetos;
+        }
+        
+
+
+        
 
     }
 
