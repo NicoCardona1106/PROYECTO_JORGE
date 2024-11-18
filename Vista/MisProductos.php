@@ -1,10 +1,15 @@
 <?php
 session_start();
-if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
-  $titulo_pag='Producto';
+if ($_SESSION['id_tipo_us'] == 3) {
+  $titulo_pag = 'Producto';
   include_once 'layouts/header.php';
-  include_once 'layouts/nav.php';
+  include_once 'layouts/navProveedor.php';
 ?>
+<script>
+    // Pasar información de proveedor desde PHP al frontend
+    const currentProviderId = <?php echo $_SESSION['id_proveedor']; ?>;
+    const currentProviderName = "<?php echo $_SESSION['nombre_us']; ?>";
+</script>
 
 <!------------------------------------------------------>
 <!--   Ventana Modal para CREAR Y EDITAR              -->
@@ -28,7 +33,7 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
           <form id="form-crear">
                 <div class="form-group">
                     <label for="id_producto">ID</label>
-                    <input type="number" id="id_producto" class="form-control" placeholder="Ingrese ID" required>
+                    <input type="number" id="id_producto" class="form-control" placeholder="Autogenerado" readonly>
                 </div>
                 <div class="form-group">
                     <label for="nombre">Nombre</label>
@@ -60,8 +65,10 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
                 </div>
                 <div class="form-group">
                     <label for="proveedor">Proveedor</label>
-                    <select name="proveedor" id="proveedor" class="form-control select2" style="width: 100%"></select>
+                    <input type="text" id="proveedor_nombre" class="form-control" value="<?php echo $_SESSION['nombre_us']; ?>" readonly>
+                    <input type="hidden" id="proveedor" name="proveedor" value="<?php echo $_SESSION['id_proveedor']; ?>">
                 </div>
+
 
                 <div class="modal-footer">
                   <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
@@ -72,48 +79,6 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
     </div>
   </div>
 </div>
-<!-------------------------------------------------->
-<!-- FIN Ventana Modal para el crear              -->
-<!-------------------------------------------------->
-
-<!-- Modal para añadir lote -->
-<div class="modal fade" id="addLoteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Añadir Lote</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form-add-lote">
-                    <div class="form-group">
-                      <label for="proveedor">Proveedor</label>
-                      <select id="proveedor" class="form-control">
-                      <!-- Opciones de proveedores -->
-                      </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="producto">Producto</label>
-                        <input type="text" class="form-control" id="producto" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="fechaVencimiento">Fecha de Vencimiento</label>
-                        <input type="date" class="form-control" id="fechaVencimiento">
-                    </div>
-                    <div class="form-group">
-                        <label for="stock">Stock</label>
-                        <input type="text" class="form-control" id="stock">
-                    </div>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 
 
@@ -163,7 +128,9 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
 <!-------------------------------------------------->
 
 
-
+<!------------------------------------------------------>
+<!-- FIN Ventana Modal para el crear                  -->
+<!------------------------------------------------------>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -186,8 +153,6 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
       </div><!-- /.container-fluid -->
     </section>
 	
-    <!------------------ Main content ------------------------------>
-    <!-- ----------------------------------------------------------->
     <!------------------ Main content ------------------------------>
     <section class="content">
       <div class="row">
@@ -219,7 +184,4 @@ else{
     header ('location: ../vista/login.php');
 }
 ?>
-<script src="../assets/js/producto.js"></script>
-<!-- /
-<script src="../assets/js/nav.js"></script>
--->
+<script src="../assets/js/producto2.js"></script>
