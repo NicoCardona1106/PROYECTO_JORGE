@@ -1,9 +1,9 @@
 <?php
 session_start();
-if ($_SESSION['id_tipo_us'] == 2) {
+if ($_SESSION['id_tipo_us'] == 4) {
   $titulo_pag = 'Bienvenido a la sección de productos';
   include_once 'layouts/header.php';
-  include_once 'layouts/navCliente.php';
+  include_once 'layouts/navInvitado.php';
 ?>
 
 <div class="content-wrapper">
@@ -67,7 +67,7 @@ if ($_SESSION['id_tipo_us'] == 2) {
             <label for="productoDescripcion">Descripción</label>
             <textarea class="form-control" id="productoDescripcion" rows="3" disabled></textarea>
           </div>
-          <button type="button" class="btn btn-primary" id="btnConfirmarAgregar">Agregar al carrito</button>
+          <button type="button" class="btn btn-primary" id="btnConfirmarAgregar" onclick="window.location.href='login.php?register=true'">Agregar al carrito</button>
         </form>
       </div>
     </div>

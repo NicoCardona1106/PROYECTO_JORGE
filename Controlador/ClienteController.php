@@ -66,8 +66,58 @@ if ($_POST['funcion'] == 'editar') {
 // Funcion Eliminar
 //-------------------------------------------------------------------
 if ($_POST['funcion'] == 'eliminar') {
-    $id = $_POST['id'];
-    $cliente->eliminar($id);
-    echo 'deleted'; // Cliente eliminado
+    $id = $_POST['id']; // Capturar el ID enviado desde el frontend
+    $cliente->eliminar($id); // Llamar al método en el modelo
+}
+
+
+
+//----------------------------------------------------------------------------------
+// Este tipo de función solo aplica para el formData (envío de archivos e imágenes)
+//----------------------------------------------------------------------------------
+
+if ($_POST['funcion'] == 'cambiar_logo') {
+    if (($_FILES['photo']['type'] == 'image/jpeg') || ($_FILES['photo']['type'] == 'image/png') || ($_FILES['photo']['type'] == 'image/gif')) {
+        // Generar un nombre único para la nueva imagen
+        $nombre = uniqid() . '-' . $_FILES['photo']['name'];
+        // Ruta donde se almacenará la imagen
+        $ruta = '../assets/img/cliente/' . $nombre;
+        // Subir la nueva imagen al servidor
+        if (move_uploaded_file($_FILES['photo']['tmp_name'], $ruta)) {
+            // Cambiar el logo en la base de datos
+            $cliente->CambiarLogo($_POST['id_avatar'], $nombre);
+
+            foreach ($cliente->objetos as $objeto) {
+                // Verificar que no sea la imagen predeterminada y que el archivo exista antes de eliminar
+                if ($objeto->avatar != 'default.png') {
+                    $ruta_actual = '../assets/img/cliente/' . $objeto->avatar;
+                    if (file_exists($ruta_actual)) {
+                        unlink($ruta_actual);
+                    }
+                }
+            }
+
+            // Respuesta JSON con la nueva ruta
+            $json = array();
+            $json[] = array(
+                'ruta' => $ruta,
+                'alert' => 'editalogo'
+            );
+        } else {
+            // En caso de que la carga de la nueva imagen falle
+            $json = array();
+            $json[] = array(
+                'alert' => 'error_upload'
+            );
+        }
+    } else {
+        // En caso de un formato de imagen incorrecto
+        $json = array();
+        $json[] = array(
+            'alert' => 'noeditalogo'
+        );
+    }
+    $jsonstring = json_encode($json[0]);
+    echo $jsonstring;
 }
 ?>

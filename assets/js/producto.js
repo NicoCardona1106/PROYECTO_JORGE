@@ -6,24 +6,20 @@ $(document).ready(function () {
     select_tipo();
     select_presentacion();
     select_proveedor();
-    
 
     //----------------------------------------------------------
-    // Construccion DataTable
+    // Construcción DataTable
     //----------------------------------------------------------
-    var tabla = $('#tabla').DataTable({  
+    var tabla = $('#tabla').DataTable({
         dom:
-        "<'row'<'col-sm-12 col-md-6'Bl><'col-sm-12 col-md-6'f>>" +
-        "<'row'<'col-sm-12'tr>>" +
-        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-       
-        "lengthMenu":		[[5, 10, 20, 25, 50, -1], [5, 10, 20, 25, 50, "Todos"]],
-        "iDisplayLength":	5,
+            "<'row'<'col-sm-12 col-md-6'Bl><'col-sm-12 col-md-6'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        "lengthMenu": [[5, 10, 20, 25, 50, -1], [5, 10, 20, 25, 50, "Todos"]],
+        "iDisplayLength": 5,
         "responsive": true,
         "autoWidth": false,
-        //Parametrizar lenguaje
-        "language" : 
-        {
+        "language": {
             "lengthMenu": "Mostrar _MENU_ registros",
             "zeroRecords": "No se encontraron resultados",
             "info": "Registros del _START_ al _END_ de un total de _TOTAL_ registros",
@@ -32,50 +28,48 @@ $(document).ready(function () {
             "sSearch": "Buscar:",
             "oPaginate": {
                 "sFirst": "Primero",
-                "sLast":"Último",
-                "sNext":"Siguiente",
+                "sLast": "Último",
+                "sNext": "Siguiente",
                 "sPrevious": "Anterior"
-             },
-             "sProcessing":"Procesando...",
+            },
+            "sProcessing": "Procesando...",
         },
-        "ajax":{            
+        "ajax": {
             "url": "../controlador/ProductoController.php",
-            "method": 'POST', //usamos el metodo POST
-            "data":{funcion:'listar'}, //enviamos POST
-            "dataSrc":""
+            "method": 'POST',
+            "data": { funcion: 'listar' },
+            "dataSrc": ""
         },
-        
-        "columns":[
-            { "data": "id", "title":"ID"},
-            { "data": "nombre", "title":"Nombre"},
-            { "data": "concentracion", "title":"Concentracion"},
-            { "data": "precio", "title":"Precio"},
-            { "data": "laboratorio", "title":"Laboratorio"},
-            { "data": "tipo", "title":"Tipo"},
-            { "data": "presentacion", "title":"Presentacion"},
-            { "data": "proveedor", "title":"Proveedor"},
-
+        "columns": [
+            { "data": "id", "title": "ID" },
+            { "data": "nombre", "title": "Nombre" },
+            { "data": "concentracion", "title": "Concentración" },
+            { "data": "precio", "title": "Precio" },
+            { "data": "cantidad", "title": "Cantidad" },
+            { "data": "laboratorio", "title": "Laboratorio" },
+            { "data": "tipo", "title": "Tipo" },
+            { "data": "presentacion", "title": "Presentación" },
+            { "data": "proveedor", "title": "Proveedor" },
             {
                 "defaultContent": "<div class='btn-group'>" +
-                  "<button class='avatar btn bg-teal btn-sm' title='Cambiar imagen' data-toggle='modal' data-target='#cambiaravatar'><i class='fas fa-image'></i></button>" +
-                  "<button class='editar btn btn-sm btn-primary' style='background-color: #005d16; title='Editar' data-toggle='modal' data-target='#crear'><i class='fas fa-pencil-alt'></i></button>" +
-                  "<button class='anadir_lote btn btn-sm' style='background-color: #007bff; color: #FFFFFF;' title='Añadir Lote' data-toggle='modal' data-target='#addLoteModal'><i class='far fa-plus-square' style='color: #FFFFFF;'></i></button>" +
-                  "<button class='eliminar btn btn-sm btn-danger' title='Eliminar'><i class='fas fa-trash'></i></button>",
+                    "<button class='avatar btn bg-teal btn-sm' title='Cambiar imagen' data-toggle='modal' data-target='#cambiaravatar'><i class='fas fa-image'></i></button>" +
+                    "<button class='editar btn btn-sm btn-primary' style='background-color: #005d16;' title='Editar' data-toggle='modal' data-target='#crear'><i class='fas fa-pencil-alt'></i></button>" +
+                    "<button class='eliminar btn btn-sm btn-danger' title='Eliminar'><i class='fas fa-trash'></i></button>",
                 "title": "Acciones"
-              }
-                      ],    
-        //Configurar COLUMNAS ---- Centrado Acciones
-        "columnDefs": [ 
-            {   "className": "text-center",
-                "targets": [0,1],
+            }
+        ],
+        "columnDefs": [
+            {
+                "className": "text-center",
+                "targets": [0, 1],
                 "visible": true,
                 "searchable": true
             }
         ],
-        buttons: ["copy", "excel", "pdf", "print", "colvis"]    
+        buttons: ["copy", "excel", "pdf", "print", "colvis"]
     });
 
-    tabla.buttons().container().appendTo($('.col-md-6:eq(0)', tabla.table().container()));  
+    tabla.buttons().container().appendTo($('.col-md-6:eq(0)', tabla.table().container()));
 
     //----------------------------------------------------------
     // Funcion que evalua click en CAMBIAR LOGO y obtiene el id
@@ -138,99 +132,80 @@ $(document).ready(function () {
     });
 
     //----------------------------------------------------------
-    // Funcion que evalua click en EDITAR y obtiene el id
-    // en DATATABLES responsives
+    // Función para buscar producto
     //----------------------------------------------------------
-    $(document).on('click','.editar',function(){
-        edit = true;
-        $('#tit_ven').html('Editar producto');
-         if(tabla.row(this).child.isShown())
-              var data = tabla.row(this).data();
-         else
-              var data = tabla.row($(this).parents("tr")).data();
-         
-        const id = data.id; //capturo el ID
-        buscar(id);        
-    }); 
-    
-    //-------------------------------------------------------------
-    //Buscar 
-    //-------------------------------------------------------------
     function buscar(dato) {
         funcion = 'buscar';
-        $.post('../controlador/ProductoController.php',{dato, funcion},(response)=>{
+        $.post('../controlador/ProductoController.php', { dato, funcion }, (response) => {
             const respuesta = JSON.parse(response);
             $('#id_producto').val(respuesta.id);
             $('#nombre').val(respuesta.nombre);
             $('#concentracion').val(respuesta.concentracion);
             $('#adicional').val(respuesta.adicional);
             $('#precio').val(respuesta.precio);
+            $('#cantidad').val(respuesta.cantidad);
             $('#laboratorio').val(respuesta.laboratorio).trigger('change');
             $('#tipo').val(respuesta.tipo).trigger('change');
             $('#presentacion').val(respuesta.presentacion).trigger('change');
             $('#proveedor').val(respuesta.proveedor).trigger('change');
-
-            ///CAMBIO LOGO
-            $('#nombre_avatar').html(respuesta.nombre);       //Nombre Producto
-            $('#id_avatar').val(respuesta.id);                //Id del prodcuto en la ventana modal cambio logo
-            $('#avataractual').attr('src','../assets/img/prod/'+respuesta.avatar);  //Logo actual
-        })
-    };
+        });
+    }
 
     //----------------------------------------------------------
-    // Funcion para crear o editar laboratorio en el formulario
+    // Función para crear o editar producto
     //----------------------------------------------------------
-    $('#form-crear').submit(e=>{
-        //Cargar los objetos de los formulario en variables JS
+    $('#form-crear').submit(e => {
         let id = $('#id_producto').val();
         let nombre = $('#nombre').val();
         let concentracion = $('#concentracion').val();
         let adicional = $('#adicional').val();
         let precio = $('#precio').val();
+        let cantidad = $('#cantidad').val();
         let laboratorio = $('#laboratorio').val();
         let tipo = $('#tipo').val();
         let presentacion = $('#presentacion').val();
-        let avatar = 'default.png';
         let proveedor = $('#proveedor').val();
 
-        if (edit == true)
-            funcion = 'editar';
-        else
-            funcion = 'crear';
+        funcion = edit ? 'editar' : 'crear';
 
-        $.post('../controlador/ProductoController.php',{id, nombre, concentracion, adicional, precio, laboratorio,tipo,presentacion, avatar, proveedor, funcion},(response)=>{
-            console.log(response);
-            if(response == 'add' || response == 'update' ){ 
-                  //Mensaje de agregar productos al carrito
-                  const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
-                    onOpen: (toast) => {
-                      toast.addEventListener('mouseenter', Swal.stopTimer)
-                      toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                  })
-                  
-                  Toast.fire({
-                    icon: 'success',
-                    title: nombre,
-                    html: 'Agregado con exito'
-                  })
-                
+        $.post('../controlador/ProductoController.php', {
+            id, nombre, concentracion, adicional, precio, cantidad,
+            laboratorio, tipo, presentacion, proveedor, funcion
+        }, (response) => {
+            if (response === 'add' || response === 'update') {
                 $('#crear').modal('hide');
                 tabla.ajax.reload(null, false);
-            }   
-            else{
-                $('#noadd').hide('slow');
-                $('#noadd').show(1000);
-                $('#noadd').hide(2000);
-            }  
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Operación exitosa',
+                    text: `Producto ${edit ? 'actualizado' : 'creado'} correctamente.`,
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo completar la operación.',
+                });
+            }
         });
         e.preventDefault();
-    });      
+    });
+
+    //----------------------------------------------------------
+    // Función que evalúa click en EDITAR y obtiene el id
+    //----------------------------------------------------------
+    $(document).on('click', '.editar', function () {
+        edit = true;
+        $('#tit_ven').html('Editar producto');
+        if (tabla.row(this).child.isShown())
+            var data = tabla.row(this).data();
+        else
+            var data = tabla.row($(this).parents("tr")).data();
+
+        const id = data.id; // Captura el ID
+        buscar(id);
+    });
+
 
     //----------------------------------------------------------
     // Funcion que evalua click en ELIMNAR y obtiene el id

@@ -18,7 +18,7 @@ if ($_SESSION['id_tipo_us'] == 3) {
   <div class="modal-dialog" role="document">
     <div class="modal-content">      
         <div class="modal-header">
-          <h5 class="modal-title"><span id="tit_ven">XXXXXXXXX</span> </h5>
+          <h5 class="modal-title"><span id="tit_ven">Crear Producto</span> </h5>
           <button data-dismiss="modal" arial-label="close" class="close">
                   <span arial-hidden="true">&times;</span>
           </button>
@@ -45,11 +45,15 @@ if ($_SESSION['id_tipo_us'] == 3) {
                 </div>
                 <div class="form-group">
                     <label for="adicional">Info adicional</label>
-                    <input type="text" id="adicional" class="form-control" placeholder="Información adicional">
+                    <input type="text" id="adicional" class="form-control" placeholder="Información adicional" required>
+                </div>
+                <div class="form-group">
+                    <label for="cantidad">Cantidad</label>
+                    <input type="number" id="cantidad" class="form-control" placeholder="Ingrese cantidad" min="1" required>
                 </div>
                 <div class="form-group">
                     <label for="precio">Precio</label>
-                    <input type="number" id="precio" class="form-control" placeholder="Precio">
+                    <input type="number" id="precio" class="form-control" placeholder="Precio" min="1" required>
                 </div>
                 <div class="form-group">
                     <label for="laboratorio">Laboratorio</label>

@@ -1,21 +1,21 @@
 <?php
 
-    include_once 'Conexion.php';
+include_once 'Conexion.php';
 
-    class Producto {
-        var $objetos;
+class Producto {
+    var $objetos;
 
-        public function __construct(){
-            $db = new Conexion();
-            $this->acceso = $db->pdo;
-        }
+    public function __construct() {
+        $db = new Conexion();
+        $this->acceso = $db->pdo;
+    }
 
         //-----------------------------------------------------------
         // Buscar los registros segun criterio de busqueda en consulta
         //-----------------------------------------------------------
-        function BuscarTodos($consulta){
-            if(!empty($consulta)){                
-                $sql = "SELECT id_producto, producto.nombre, concentracion, adicional, precio, producto.id_laboratorio,
+        function BuscarTodos($consulta) {
+            if (!empty($consulta)) {
+                $sql = "SELECT id_producto, producto.nombre, concentracion, adicional, precio, cantidad, producto.id_laboratorio,
                                 laboratorio.nombre as laboratorio, producto.id_tip_prod, tipo_producto.nombre as tipo, 
                                 producto.id_presentacion, presentacion.nombre as presentacion, producto.avatar, proveedor.id_proveedor, proveedor.nombre as proveedor
                         FROM    producto 
@@ -25,11 +25,10 @@
                         JOIN    proveedor ON producto.id_proveedor = proveedor.id_proveedor
                         WHERE   producto.nombre LIKE :consulta";
                 $query = $this->acceso->prepare($sql);
-                $query->execute(array(':consulta'=>"%$consulta%"));
+                $query->execute(array(':consulta' => "%$consulta%"));
                 $this->objetos = $query->fetchall();
-            }
-            else{
-                $sql = "SELECT id_producto, producto.nombre, concentracion, adicional, precio, producto.id_laboratorio,
+            } else {
+                $sql = "SELECT id_producto, producto.nombre, concentracion, adicional, precio, cantidad, producto.id_laboratorio,
                                 laboratorio.nombre as laboratorio, producto.id_tip_prod, tipo_producto.nombre as tipo, 
                                 producto.id_presentacion, presentacion.nombre as presentacion, producto.avatar, proveedor.id_proveedor, proveedor.nombre as proveedor
                         FROM    producto 
@@ -38,14 +37,14 @@
                         JOIN    presentacion ON producto.id_presentacion = presentacion.id_presentacion
                         JOIN    proveedor ON producto.id_proveedor = proveedor.id_proveedor
                         WHERE   producto.nombre NOT LIKE '' 
-                        ORDER BY id_producto";          
+                        ORDER BY id_producto";
                 $query = $this->acceso->prepare($sql);
                 $query->execute();
                 $this->objetos = $query->fetchall();
             }
-            return $this->objetos;    
+            return $this->objetos;
         }
-        
+
         //--------------------------------
         //Obtener Ultimo ID
         //--------------------------------
@@ -70,65 +69,90 @@
             }
         }
         
+        public function restaurarPrecioOriginal($id_producto) {
+            try {
+                // Verificar la cantidad actual del producto
+                $sql_check = "SELECT cantidad, precio_original FROM producto WHERE id_producto = :id_producto";
+                $stmt_check = $this->acceso->prepare($sql_check);
+                $stmt_check->execute(['id_producto' => $id_producto]);
+                $producto = $stmt_check->fetch(PDO::FETCH_ASSOC);
         
+                if ($producto && $producto['cantidad'] < 20) {
+                    // Actualizar el precio al precio original
+                    $sql_update = "UPDATE producto SET precio = :precio_original WHERE id_producto = :id_producto";
+                    $stmt_update = $this->acceso->prepare($sql_update);
+                    $stmt_update->execute([
+                        'precio_original' => $producto['precio_original'],
+                        'id_producto' => $id_producto
+                    ]);
+        
+                    return true; // Precio actualizado correctamente
+                }
+                return false; // No se necesitó actualizar el precio
+            } catch (PDOException $e) {
+                // Manejo de errores
+                echo "Error: " . $e->getMessage();
+                return false;
+            }
+        }
+
         //-----------------------------------------------------------
         // Buscar un registro por ID
         //-----------------------------------------------------------
-        function Buscar($id){
-            $sql = "SELECT id_producto, nombre, concentracion, adicional, precio, id_laboratorio, id_tip_prod, 
-                           id_presentacion, avatar, id_proveedor 
-                    FROM producto WHERE id_producto = :id";          
+        function Buscar($id) {
+            $sql = "SELECT id_producto, nombre, concentracion, adicional, precio, cantidad, id_laboratorio, id_tip_prod, 
+                        id_presentacion, avatar, id_proveedor 
+                    FROM producto WHERE id_producto = :id";
             $query = $this->acceso->prepare($sql);
-            $query->execute(array(':id'=>$id));
+            $query->execute(array(':id' => $id));
             $this->objetos = $query->fetchall();
-            
-            return $this->objetos;    
+
+            return $this->objetos;
         }
-        
+                
 
         //-------------------------------------------
-        //Crear
+        // Crear
         //-------------------------------------------
-        function Crear($id, $nombre, $concentracion, $adicional, $precio, $laboratorio, $tipo, $presentacion, $avatar, $proveedor){
+        function Crear($id, $nombre, $concentracion, $adicional, $precio, $cantidad, $laboratorio, $tipo, $presentacion, $avatar, $proveedor) {
             $sql = "SELECT id_producto FROM producto WHERE id_producto = :id";
             $query = $this->acceso->prepare($sql);
-            $query->execute(array(':id'=>$id));
+            $query->execute(array(':id' => $id));
             $this->objetos = $query->fetchall();
-            if(!empty($this->objetos)){
+            if (!empty($this->objetos)) {
                 echo 'noadd';
-            }
-            else{
+            } else {
                 $sql = "INSERT INTO producto (id_producto, nombre, concentracion, adicional,
-                            precio, id_laboratorio, id_tip_prod, id_presentacion, avatar, id_proveedor)
-                        VALUES (:id, :nombre, :concentracion, :adicional, :precio,
+                            precio, cantidad, id_laboratorio, id_tip_prod, id_presentacion, avatar, id_proveedor)
+                        VALUES (:id, :nombre, :concentracion, :adicional, :precio, :cantidad,
                                 :laboratorio, :tipo, :presentacion, :avatar, :proveedor)";
                 $query = $this->acceso->prepare($sql);
-                $query->execute(array(':id'=>$id, ':nombre'=>$nombre, ':concentracion'=>$concentracion,
-                                      ':adicional'=>$adicional, ':precio'=>$precio,
-                                      ':laboratorio'=>$laboratorio, ':tipo'=>$tipo,
-                                      ':presentacion'=>$presentacion, ':avatar'=>$avatar,
-                                      ':proveedor'=>$proveedor));
+                $query->execute(array(':id' => $id, ':nombre' => $nombre, ':concentracion' => $concentracion,
+                    ':adicional' => $adicional, ':precio' => $precio, ':cantidad' => $cantidad,
+                    ':laboratorio' => $laboratorio, ':tipo' => $tipo,
+                    ':presentacion' => $presentacion, ':avatar' => $avatar,
+                    ':proveedor' => $proveedor));
                 echo 'add';
             }
         }
-        
+            
         //-----------------------------------------------------------
         // Editar
         //-----------------------------------------------------------
-        function Editar($id, $nombre, $concentracion, $adicional, $precio, $laboratorio, $tipo, $presentacion, $proveedor){
+        function Editar($id, $nombre, $concentracion, $adicional, $precio, $cantidad, $laboratorio, $tipo, $presentacion, $proveedor) {
             $sql = "UPDATE producto SET nombre = :nombre, concentracion = :concentracion,
-                           adicional = :adicional, precio = :precio, 
-                           id_laboratorio = :laboratorio, id_tip_prod = :tipo,
-                           id_presentacion = :presentacion, id_proveedor = :proveedor 
-                    WHERE id_producto = :id";        
+                        adicional = :adicional, precio = :precio, cantidad = :cantidad,
+                        id_laboratorio = :laboratorio, id_tip_prod = :tipo,
+                        id_presentacion = :presentacion, id_proveedor = :proveedor 
+                    WHERE id_producto = :id";
             $query = $this->acceso->prepare($sql);
-            $query->execute(array(':id'=>$id, ':nombre'=>$nombre, ':concentracion'=>$concentracion,
-                                  ':adicional'=>$adicional, ':precio'=>$precio,
-                                  ':laboratorio'=>$laboratorio, ':tipo'=>$tipo,
-                                  ':presentacion'=>$presentacion, ':proveedor'=>$proveedor));
+            $query->execute(array(':id' => $id, ':nombre' => $nombre, ':concentracion' => $concentracion,
+                ':adicional' => $adicional, ':precio' => $precio, ':cantidad' => $cantidad,
+                ':laboratorio' => $laboratorio, ':tipo' => $tipo,
+                ':presentacion' => $presentacion, ':proveedor' => $proveedor));
             echo 'update';
         }
-        
+
         //-----------------------------------------------------------
         // Eliminar
         //-----------------------------------------------------------
@@ -181,7 +205,7 @@
         //--------------------------------
 
         public function BuscarPorProveedor($idProveedor) {
-            $sql = "SELECT id_producto, producto.nombre, concentracion, adicional, precio, producto.id_laboratorio,
+            $sql = "SELECT id_producto, producto.nombre, concentracion, adicional, precio, cantidad, producto.id_laboratorio,
                             laboratorio.nombre as laboratorio, producto.id_tip_prod, tipo_producto.nombre as tipo, 
                             producto.id_presentacion, presentacion.nombre as presentacion, producto.avatar
                     FROM    producto 
@@ -195,11 +219,34 @@
             $this->objetos = $query->fetchAll(PDO::FETCH_OBJ);
         
             return $this->objetos;
+        }        
+        
+
+        //--------------------------------
+        //Buscar Productos con Descuento
+        //--------------------------------
+
+        public function obtenerProductosConDescuento() {
+            try {
+                $sql = "SELECT 
+                            id_producto, 
+                            nombre, 
+                            concentracion, 
+                            adicional, 
+                            precio, 
+                            precio_original, 
+                            avatar, 
+                            tipo_descuento 
+                        FROM producto 
+                        WHERE tipo_descuento IS NOT NULL";
+                $query = $this->acceso->prepare($sql);
+                $query->execute();
+                return $query->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                error_log("Error al obtener productos con descuento: " . $e->getMessage());
+                return [];
+            }
         }
-        
-
-
-        
 
     }
 
