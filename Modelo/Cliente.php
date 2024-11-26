@@ -90,7 +90,13 @@ class Cliente {
     public function eliminar($id) {
         $query = "DELETE FROM clientes WHERE id = :id";
         $stmt = $this->acceso->prepare($query);
-        $stmt->execute(array(':id' => $id));
+    
+        // Ejecutar la consulta y verificar el resultado
+        if ($stmt->execute(array(':id' => $id))) {
+            echo 'eliminado'; // Mensaje de éxito
+        } else {
+            echo 'noeliminado'; // Mensaje de error
+        }
     }
 
     // Método para verificar si el cliente ya existe
@@ -116,6 +122,27 @@ class Cliente {
         
         // Si hay algún resultado, el cliente ya existe
         return $stmt->rowCount() > 0;
+    }
+
+
+    //--------------------------------
+    //Cambiar Avatar    
+    //--------------------------------
+    function CambiarLogo($id, $img){
+        //Consulta el nombre de la imagen antes de borrarla
+        $sql = 'SELECT avatar from clientes WHERE id = :id';        
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id'=>$id));
+        $this->objetos = $query->fetchall();
+        
+        //Actualiza la imagen
+        $sql = 'UPDATE clientes SET avatar = :img WHERE id = :id';
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id'=>$id,':img'=>$img));
+
+        //Retorna la imagen antigua
+        return $this->objetos;
+        
     }
 
 

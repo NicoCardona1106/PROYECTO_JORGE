@@ -14,8 +14,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'guest_login') {
     $_SESSION['nombre_us'] = 'Invitado';
     $_SESSION['dni_us'] = 'GUEST';
     
-    // Redirigir al invitado a la página de clientes
-    header('location: ../vista/PaginaCI.php');
+    // Redirigir al invitado a la página de invitados
+    header('location: ../vista/PaginaIn.php');
     exit();
 }
 
@@ -35,7 +35,7 @@ if (!empty($_SESSION['id_tipo_us'])){
             header('location: ../vista/PaginaP.php');
             break;
         case 4:
-            header('location: ../vista/PaginaCI.php');
+            header('location: ../vista/PaginaIn.php'); // Invitado redirigido aquí
             break;
     }
 } else {
@@ -73,7 +73,7 @@ if (!empty($_SESSION['id_tipo_us'])){
                 header('location: ../vista/PaginaP.php'); // Proveedor
                 break;
             case 4:
-                header('location: ../vista/PaginaCI.php');
+                header('location: ../vista/PaginaIn.php'); // Invitado redirigido aquí
                 break;
         }
     } else {

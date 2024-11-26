@@ -12,7 +12,7 @@ class Productos {
 
     function listar() {
         // Consulta SQL para obtener los datos de los productos
-        $sql = "SELECT id_producto,nombre, concentracion, adicional,precio,avatar FROM producto";
+        $sql = "SELECT id_producto,nombre, concentracion, adicional,precio,avatar FROM producto WHERE cantidad > 0";
         
         // Prepara y ejecuta la consulta
         $query = $this->acceso->prepare($sql);

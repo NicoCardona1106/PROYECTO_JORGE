@@ -1,9 +1,9 @@
 <?php
 session_start();
-if ($_SESSION['id_tipo_us'] == 2) {
+if ($_SESSION['id_tipo_us'] == 4) {
   $titulo_pag = 'Bienvenido a Nuestra Tienda Virtual';
   include_once 'layouts/header.php';
-  include_once 'layouts/navCliente.php';
+  include_once 'layouts/navInvitado.php';
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -25,7 +25,7 @@ if ($_SESSION['id_tipo_us'] == 2) {
       </div><!-- /.container-fluid -->
     </section>
 
-    <!------------------ Main content ------------------------------->
+    <!------------------ Main content ------------------------------->  
     <section class="content">
       <div class="row">
         <div class="col-12 text-center">
@@ -37,9 +37,10 @@ if ($_SESSION['id_tipo_us'] == 2) {
             <div class="card-body">
               <p class="lead">Explora nuestros productos y disfruta de una experiencia de compra única.</p>
               <div class="btn-group mt-3" role="group" aria-label="Basic example">
-                <a href="productos.php" class="btn btn-primary">Ver Productos</a>
-                <a href="productosOferta.php" class="btn btn-success">Ofertas Especiales</a>
+                <a href="productosIn.php" class="btn btn-primary">Ver Productos</a>
+                <a href="ofertas.php" class="btn btn-success">Ofertas Especiales</a>
                 <a href="adm_contactos.php" class="btn btn-info">Contáctanos</a>
+                <a href="login.php?register=true" class="btn btn-warning">Registrarse</a>
               </div>
             </div>
             <!-- /.card-body -->

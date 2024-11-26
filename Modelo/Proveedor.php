@@ -90,8 +90,10 @@ class Proveedor {
         public function eliminar($id_proveedor) {
             $query = "DELETE FROM proveedor WHERE id_proveedor = :id_proveedor";
             $stmt = $this->acceso->prepare($query);
-            $stmt->execute(array(':id_proveedor' => $id_proveedor)); // Cambiado para usar id_proveedor
+            return $stmt->execute(array(':id_proveedor' => $id_proveedor)); // Retornar true o false
         }
+
+
     
         // Método para verificar si el proveedor ya existe
         public function existeProveedor($nombre, $apellido, $dni, $correo, $id_proveedor = null) {
@@ -151,5 +153,176 @@ class Proveedor {
             
         }
 
+        //-----------------------------
+        // Historial de Ventas
+        //-----------------------------
+        public function obtenerHistorialVentas($id_proveedor) {
+            try {
+                $query = "
+                    SELECT 
+                        dc.id_detalle, 
+                        dc.id_compra, 
+                        p.nombre AS producto, 
+                        dc.cantidad, 
+                        dc.precio_unitario, 
+                        (dc.cantidad * dc.precio_unitario) AS total, 
+                        c.fecha
+                    FROM detalle_compras dc
+                    JOIN producto p ON dc.id_producto = p.id_producto
+                    JOIN compras c ON dc.id_compra = c.id_compra
+                    WHERE dc.id_proveedor = :id_proveedor AND dc.estado = 'APROBADO'
+                    ORDER BY c.fecha DESC
+                ";
+                
+                $stmt = $this->acceso->prepare($query);
+                $stmt->execute([':id_proveedor' => $id_proveedor]);
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                error_log("Error en obtenerHistorialVentas: " . $e->getMessage());
+                return ['status' => 'error', 'message' => 'Error al obtener el historial de ventas.'];
+            }
+        }
+        
+        public function obtenerTotalVendido($id_proveedor) {
+            try {
+                $query = "
+                    SELECT 
+                        SUM(dc.cantidad * dc.precio_unitario) AS total_vendido
+                    FROM detalle_compras dc
+                    WHERE dc.id_proveedor = :id_proveedor AND dc.estado = 'APROBADO'
+                ";
+                
+                $stmt = $this->acceso->prepare($query);
+                $stmt->execute([':id_proveedor' => $id_proveedor]);
+                return $stmt->fetch(PDO::FETCH_ASSOC)['total_vendido'];
+            } catch (Exception $e) {
+                error_log("Error en obtenerTotalVendido: " . $e->getMessage());
+                return 0;
+            }
+        }
+        
+
+
+        //-----------------------------
+        // Manejo De Órdenes
+        //-----------------------------
+        public function obtenerOrdenesPorProveedor($id_proveedor) {
+            try {
+                $query = "
+                    SELECT 
+                        dc.id_detalle, 
+                        dc.id_compra, 
+                        p.nombre AS producto, 
+                        dc.cantidad, 
+                        dc.precio_unitario, 
+                        dc.estado, 
+                        c.fecha
+                    FROM detalle_compras dc
+                    JOIN producto p ON dc.id_producto = p.id_producto
+                    JOIN compras c ON dc.id_compra = c.id_compra
+                    WHERE dc.id_proveedor = :id_proveedor AND dc.estado IN ('PENDIENTE', 'RECHAZADO')
+                    ORDER BY c.fecha DESC
+                ";
+                
+                $stmt = $this->acceso->prepare($query); // Preparar la consulta
+                $stmt->execute([':id_proveedor' => $id_proveedor]); // Pasar parámetros
+                return $stmt->fetchAll(PDO::FETCH_ASSOC); // Obtener resultados
+            } catch (Exception $e) {
+                error_log("Error en obtenerOrdenesPorProveedor: " . $e->getMessage());
+                return ['status' => 'error', 'message' => 'Error al obtener órdenes del proveedor.'];
+            }
+        }
+        
+
+        public function actualizarEstadoProducto($id_detalle, $nuevo_estado) {
+            try {
+                // Actualizar el estado del producto en detalle_compras
+                $query = "UPDATE detalle_compras SET estado = :estado WHERE id_detalle = :id_detalle";
+                $stmt = $this->acceso->prepare($query);
+                $stmt->execute([':estado' => $nuevo_estado, ':id_detalle' => $id_detalle]);
+        
+                // Restar la cantidad del producto si el nuevo estado es 'APROBADO'
+                if ($nuevo_estado === 'APROBADO') {
+                    $this->restarCantidadProducto($id_detalle);
+                }
+        
+                // Actualizar el estado de la compra si es necesario
+                $this->actualizarEstadoCompra($id_detalle);
+        
+                return ['status' => 'success', 'message' => 'Estado actualizado correctamente'];
+            } catch (Exception $e) {
+                error_log("Error al actualizar estado del producto: " . $e->getMessage());
+                return ['status' => 'error', 'message' => 'No se pudo actualizar el estado'];
+            }
+        }
+        
+        private function restarCantidadProducto($id_detalle) {
+            try {
+                // Obtener la cantidad y el producto relacionado con el detalle
+                $query = "
+                    SELECT dc.id_producto, dc.cantidad, p.cantidad AS stock_actual
+                    FROM detalle_compras dc
+                    JOIN producto p ON dc.id_producto = p.id_producto
+                    WHERE dc.id_detalle = :id_detalle
+                ";
+                $stmt = $this->acceso->prepare($query);
+                $stmt->execute([':id_detalle' => $id_detalle]);
+                $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+                if ($producto) {
+                    $nueva_cantidad = $producto['stock_actual'] - $producto['cantidad'];
+                    if ($nueva_cantidad < 0) {
+                        error_log("Error: La cantidad en stock no puede ser negativa para el producto ID: " . $producto['id_producto']);
+                        return;
+                    }
+        
+                    // Actualizar el stock del producto
+                    $query_update = "UPDATE producto SET cantidad = :nueva_cantidad WHERE id_producto = :id_producto";
+                    $stmt_update = $this->acceso->prepare($query_update);
+                    $stmt_update->execute([
+                        ':nueva_cantidad' => $nueva_cantidad,
+                        ':id_producto' => $producto['id_producto']
+                    ]);
+                }
+            } catch (Exception $e) {
+                error_log("Error al restar cantidad del producto: " . $e->getMessage());
+            }
+        }        
+        
+
+        private function actualizarEstadoCompra($id_detalle) {
+            try {
+                // Verificar el estado de los productos en la misma compra
+                $query = "
+                    SELECT 
+                        dc.id_compra, 
+                        SUM(dc.estado = 'APROBADO') AS aprobados, 
+                        SUM(dc.estado = 'RECHAZADO') AS rechazados, 
+                        COUNT(dc.id_detalle) AS total
+                    FROM detalle_compras dc
+                    WHERE dc.id_compra = (SELECT id_compra FROM detalle_compras WHERE id_detalle = :id_detalle)
+                    GROUP BY dc.id_compra
+                ";
+                $stmt = $this->acceso->prepare($query);
+                $stmt->execute([':id_detalle' => $id_detalle]);
+        
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+                // Determinar el nuevo estado de la compra
+                $estado_compra = 'PENDIENTE';
+                if ($result['rechazados'] > 0) {
+                    $estado_compra = 'RECHAZADO';
+                } elseif ($result['aprobados'] == $result['total']) {
+                    $estado_compra = 'PAGADO';
+                }
+        
+                // Actualizar el estado de la compra
+                $query = "UPDATE compras SET estado = :estado WHERE id_compra = :id_compra";
+                $stmt = $this->acceso->prepare($query);
+                $stmt->execute([':estado' => $estado_compra, ':id_compra' => $result['id_compra']]);
+            } catch (Exception $e) {
+                error_log("Error al actualizar estado de la compra: " . $e->getMessage());
+            }
+        }
     }
 ?>

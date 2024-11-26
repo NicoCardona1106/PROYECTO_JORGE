@@ -1,24 +1,67 @@
-$(document).ready(function() {
+$(document).ready(function () {
     var funcion;
     var datatable;
     var edit = false; // Variable para determinar si estamos editando
 
+    // Listar clientes
+    function listar() {
+        funcion = 'listar';
+        datatable = $('#tabla').DataTable({
+            ajax: {
+                url: "../controlador/ClienteController.php",
+                method: "POST",
+                data: { funcion: funcion }
+            },
+            columns: [
+                { data: "id" },
+                { data: "nombre" },
+                { data: "apellido" },
+                { data: "dni" },
+                { data: "edad" },
+                { data: "sexo" },
+                { data: "email" },
+                { data: "telefono" },
+                { data: "direccion" },
+                {
+                    data: "avatar",
+                    render: function (data) {
+                        return `<img src="../assets/img/cliente/${data}" class="img-fluid rounded-circle" width="50" height="50">`;
+                    },
+                    title: "Avatar"
+                },
+                {
+                    defaultContent: `<div class='btn-group'>
+                        <button class='avatar btn bg-teal btn-sm' title='Cambiar imagen' data-toggle='modal' data-target='#cambiaravatar'><i class='fas fa-image'></i></button>
+                        <button class='editar btn btn-sm btn-primary' style='background-color: #005d16;' title='Editar' data-toggle='modal' data-target='#crear'><i class='fas fa-pencil-alt'></i></button>
+                        <button class='eliminar btn btn-sm btn-danger' title='Eliminar'><i class='fas fa-trash'></i></button>
+                    </div>`,
+                    title: "Acciones"
+                }
+            ],
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+            }
+        });
+    }
+
     // Crear cliente o editar
-    $('#form-crear').submit(e => {
+    $('#form-crear').submit(function (e) {
+        e.preventDefault(); // Prevenir el envío por defecto del formulario
+
         let id = $('#id').val(); // Campo id oculto para editar
         let nombre = $('#nombre').val();
-        let apellido = $('#apellido').val(); // Campo adicional para apellido
-        let dni = $('#dni').val(); // Campo adicional para dni
-        let edad = $('#edad').val(); // Campo adicional para edad
-        let sexo = $('#sexo').val(); // Campo adicional para sexo
+        let apellido = $('#apellido').val();
+        let dni = $('#dni').val();
+        let edad = $('#edad').val();
+        let sexo = $('#sexo').val();
         let email = $('#email').val();
         let telefono = $('#telefono').val();
-        let direccion = $('#direccion').val(); // Campo adicional para dirección
-        let avatar = $('#avatar').val(); // Campo adicional para avatar
+        let direccion = $('#direccion').val();
+        let avatar = $('#avatar').val();
 
-        funcion = edit ? 'editar' : 'crear'; // Usar operador ternario para definir la función
+        funcion = edit ? 'editar' : 'crear';
 
-        $.post('../controlador/ClienteController.php', {funcion, id, nombre, apellido, dni, edad, sexo, email, telefono, direccion, avatar}, (response) => {
+        $.post('../controlador/ClienteController.php', { funcion, id, nombre, apellido, dni, edad, sexo, email, telefono, direccion, avatar }, function (response) {
             if (response == 'add') {
                 $('#add').show(1000).hide(2000);
             } else if (response == 'edit') {
@@ -29,15 +72,14 @@ $(document).ready(function() {
             $('#form-crear').trigger('reset');
             $('#crear').modal('hide');
             datatable.ajax.reload();
-            edit = false; // Reseteamos a crear después de editar
+            edit = false;
         });
-        e.preventDefault();
     });
 
-    // Función para capturar el evento de editar
-    $(document).on('click', '.editar', function() {
+    // Capturar el evento de editar
+    $(document).on('click', '.editar', function () {
         let data = datatable.row($(this).parents('tr')).data();
-        $('#id').val(data.id); // Llenar el campo id
+        $('#id').val(data.id);
         $('#nombre').val(data.nombre);
         $('#apellido').val(data.apellido);
         $('#dni').val(data.dni);
@@ -47,61 +89,92 @@ $(document).ready(function() {
         $('#telefono').val(data.telefono);
         $('#direccion').val(data.direccion);
         $('#avatar').val(data.avatar);
-        edit = true; // Establecer modo de edición
+        edit = true;
         $('#tit_ven').text('Editar Cliente');
     });
 
-    // Evento para restablecer el formulario al cerrar el modal
+    // Restablecer el formulario al cerrar el modal
     $('#crear').on('hidden.bs.modal', function () {
-        $('#form-crear').trigger('reset'); // Resetea el formulario
-        edit = false; // Resetea el estado a crear
-        $('#tit_ven').text('Crear Cliente'); // Cambia el título de nuevo
+        $('#form-crear').trigger('reset');
+        edit = false;
+        $('#tit_ven').text('Crear Cliente');
     });
 
-    // Función para eliminar clientes
-    $(document).on('click', '.borrar', function() {
-        let data = datatable.row($(this).parents('tr')).data();
-        let id = data.id;
-
-        if (confirm("¿Estás seguro de que quieres eliminar este cliente?")) {
-            funcion = 'eliminar';
-            $.post('../controlador/ClienteController.php', {funcion, id}, (response) => {
-                if (response == 'deleted') {
-                    $('#delete').show(1000).hide(2000);
-                    datatable.ajax.reload();
-                }
-            });
+    // Eliminar cliente
+    $(document).on('click', '.eliminar', function () {
+        let data;
+        if (datatable.row(this).child.isShown()) {
+            data = datatable.row(this).data();
+        } else {
+            data = datatable.row($(this).parents('tr')).data();
         }
-    });
+        const id = data.id;
+        const nombre = data.nombre;
 
-    // Listar clientes
-    function listar() {
-        funcion = 'listar';
-        datatable = $('#tabla').DataTable({
-            "ajax": {
-                "url": "../controlador/ClienteController.php",
-                "method": "POST",
-                "data": {funcion: funcion}
-            },
-            "columns": [
-                { "data": "id" },
-                { "data": "nombre" },
-                { "data": "apellido" },
-                { "data": "dni" },
-                { "data": "edad" },
-                { "data": "sexo" },
-                { "data": "email" },
-                { "data": "telefono" },
-                { "data": "direccion" },
-                { "data": "avatar" },
-                { "defaultContent": `<button class="editar btn btn-success" type="button" data-toggle="modal" data-target="#crear"><i class="fas fa-edit"></i></button>
-                                     <button class="borrar btn btn-danger"><i class="fas fa-trash-alt"></i></button>` }
-            ],
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+        Swal.fire({
+            title: `¿Deseas eliminar a ${nombre}?`,
+            text: "¡Esta acción no se puede revertir!",
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                funcion = 'eliminar';
+                $.post('../controlador/ClienteController.php', { id, funcion }, function (response) {
+                    if (response === 'eliminado') {
+                        Swal.fire('Eliminado!', `${nombre} fue eliminado correctamente.`, 'success');
+                        datatable.ajax.reload(null, false);
+                    } else {
+                        Swal.fire('Error!', 'No se pudo eliminar el cliente.', 'error');
+                    }
+                });
             }
         });
-    }
+    });
+
+    // Cambiar avatar
+    $(document).on('click', '.avatar', function () {
+        let data;
+        if (datatable.row(this).child.isShown()) {
+            data = datatable.row(this).data();
+        } else {
+            data = datatable.row($(this).parents('tr')).data();
+        }
+
+        const id = data.id;
+        $('#id_avatar').val(id);
+        $('#nombre_avatar').html(data.nombre);
+        $('#avataractual').attr('src', `../assets/img/cliente/${data.avatar}`);
+        $('#funcion').val('cambiar_logo');
+    });
+
+    // Cambiar logo al enviar el formulario
+    $('#form-logo').submit(function (e) {
+        e.preventDefault();
+        let formData = new FormData($('#form-logo')[0]);
+        $.ajax({
+            url: '../controlador/ClienteController.php',
+            type: 'POST',
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false
+        }).done(function (response) {
+            console.log(response);
+
+            const json = JSON.parse(response);
+            if (json.alert === 'editalogo') {
+                $('#avataractual').attr('src', `../assets/img/cliente/${json.ruta.split('/').pop()}`);
+                $('#updatelogo').hide('slow').show(1000).hide(2000);
+                datatable.ajax.reload(null, false);
+            } else {
+                $('#noupdatelogo').hide('slow').show(1000).hide(2000);
+            }
+        });
+    });
 
     listar();
 });

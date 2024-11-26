@@ -46,7 +46,7 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
                         <input type="text" id="dni" class="form-control" placeholder="Ingrese DNI" required>
                     </div>
                     <div class="form-group">
-                        <label for="edad">Edad</label>
+                        <label for="edad">Fecha De Nacimiento</label>
                         <input type="date" id="edad" class="form-control" placeholder="Ingrese edad" required>
                     </div>
                     <div class="form-group">
@@ -64,11 +64,11 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
                     </div>
                     <div class="form-group">
                         <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" class="form-control" placeholder="Ingrese teléfono">
+                        <input type="number" id="telefono" class="form-control" placeholder="Ingrese teléfono" min="1" required>
                     </div>
                     <div class="form-group">
                         <label for="direccion">Dirección</label>
-                        <input type="text" id="direccion" class="form-control" placeholder="Ingrese dirección">
+                        <input type="text" id="direccion" class="form-control" placeholder="Ingrese dirección" required>
                     </div>
                     <div class="form-group">
                         <label for="avatar">Avatar</label>
@@ -77,6 +77,43 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
                         <button type="submit" class="btn bg-gradient-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-------------------------------------------------------> 
+<!--   Ventana Modal para CAMBIAR LOGO (AVATAR)       -->
+<!-------------------------------------------------------> 
+<div class="modal fade" id="cambiaravatar" tabindex="-1" role="dialog" aria-labelledby="cambiarAvatarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cambiarAvatarLabel">Cambiar Avatar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <img id="avataractual" src="" class="profile-user-img img-fluid img-circle">
+                </div>
+                <div class="alert alert-success text-center" id="updatelogo" style='display:none;'>
+                    <i class="fa fa-check-circle m-1"> Imagen cambiada correctamente</i>
+                </div>
+                <div class="alert alert-danger text-center" id="noupdatelogo" style='display:none;'>
+                    <i class="fa fa-times-circle m-1"> Formato de imagen incorrecto</i>
+                </div>
+                <form id="form-logo" enctype="multipart/form-data">
+                    <div class="input-group mb-3">
+                        <input type="file" name="photo" class="form-control" required>
+                        <input type="hidden" name="funcion" id="funcion" value="cambiar_logo">
+                        <input type="hidden" name="id_avatar" id="id_avatar">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn bg-gradient-primary">Cambiar imagen</button>
                     </div>
                 </form>
             </div>
@@ -117,11 +154,11 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
                             <table id="tabla" class="table table-bordered table-striped table-hover dataTable dtr-inline" role="grid">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
+                                        <th>ID</th>
                                         <th>Nombre</th>
                                         <th>Apellido</th>
                                         <th>DNI</th>
-                                        <th>Edad</th>
+                                        <th>Fecha De Nacimiento</th>
                                         <th>Sexo</th>
                                         <th>Correo</th>
                                         <th>Teléfono</th>

@@ -34,9 +34,12 @@
 <?php
 session_start();
 if (!empty($_SESSION['id_tipo_us'])) { 	
-    header('location: ../controlador/LoginController.php');
+    // Si quieres que el registro funcione incluso con sesión activa, 
+    // puedes comentar la línea de redirección o agregar una condición
+    // header('location: ../controlador/LoginController.php');
 } else {
     session_destroy();
+}
 ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <body class="hold-transition login-page">
@@ -112,7 +115,7 @@ if (!empty($_SESSION['id_tipo_us'])) {
             <input type="number" class="form-control" id="dni" name="dni" placeholder="Ingrese el DNI" required>
           </div>
           <div class="form-group">
-            <label for="edad">Edad</label>
+            <label for="edad">Fecha De Nacimiento</label>
             <input type="date" class="form-control" id="edad" name="edad" placeholder="Ingrese la edad" required>
           </div>
           <div class="form-group">
@@ -121,7 +124,7 @@ if (!empty($_SESSION['id_tipo_us'])) {
           </div>
           <div class="form-group">
             <label for="telefono">Teléfono</label>
-            <input type="number" class="form-control" id="telefono" name="telefono" placeholder="Ingrese el Teléfono" required>
+            <input type="number" class="form-control" id="telefono" name="telefono" placeholder="Ingrese el Teléfono" min="1" required>
           </div>
           <div class="form-group">
             <label for="direccion">Dirección</label>
@@ -180,6 +183,14 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 $(document).ready(function() {
+  // Verificar si se debe abrir el modal de registro
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('register') || urlParams.has('open_modal')) {
+    $('#tipoUsuario').val('cliente');
+    $('#crearCuentaModalLabel').text('Crear Cuenta de Cliente');
+    $('#crearCuentaModal').modal('show');
+  }
+
   $('#btn-crear-cliente').click(function() {
     $('#tipoUsuario').val('cliente');
     $('#crearCuentaModalLabel').text('Crear Cuenta de Cliente');
@@ -223,8 +234,6 @@ $(document).ready(function() {
       $(this).removeClass('is-invalid');
     }
   });
-
-  
 
   if (!isFormValid) return;
 
@@ -274,6 +283,3 @@ $(document).ready(function() {
 </script>
 </body>
 </html>
-<?php
-}
-?>

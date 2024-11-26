@@ -1,21 +1,21 @@
 <?php
 session_start();
-if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
-  $titulo_pag='Producto';
-  include_once 'layouts/header.php';
-  include_once 'layouts/nav.php';
+if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
+    $titulo_pag = 'Producto';
+    include_once 'layouts/header.php';
+    include_once 'layouts/nav.php';
 ?>
 
-<!------------------------------------------------------>
-<!--   Ventana Modal para CREAR Y EDITAR              -->
-<!------------------------------------------------------>
+<!-------------------------------------------------->
+<!-- Ventana Modal para CREAR Y EDITAR -->
+<!-------------------------------------------------->
 <div class="modal fade" id="crear" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">      
         <div class="modal-header">
-          <h5 class="modal-title"><span id="tit_ven">XXXXXXXXX</span> </h5>
-          <button data-dismiss="modal" arial-label="close" class="close">
-                  <span arial-hidden="true">&times;</span>
+          <h5 class="modal-title"><span id="tit_ven">Crear Producto</span></h5>
+          <button data-dismiss="modal" aria-label="close" class="close">
+                  <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
@@ -40,11 +40,15 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
                 </div>
                 <div class="form-group">
                     <label for="adicional">Info adicional</label>
-                    <input type="text" id="adicional" class="form-control" placeholder="Información adicional">
+                    <input type="text" id="adicional" class="form-control" placeholder="Información adicional" required>
                 </div>
                 <div class="form-group">
-                    <label for="precio">Precio</label>
-                    <input type="number" id="precio" class="form-control" placeholder="Precio">
+                    <label for="precio">Precio</label>  
+                    <input type="number" id="precio" class="form-control" placeholder="Precio" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="cantidad">Cantidad</label>
+                    <input type="number" id="cantidad" class="form-control" placeholder="Ingrese cantidad" min="1" required>
                 </div>
                 <div class="form-group">
                     <label for="laboratorio">Laboratorio</label>
@@ -72,9 +76,10 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
     </div>
   </div>
 </div>
-<!-------------------------------------------------->
-<!-- FIN Ventana Modal para el crear              -->
-<!-------------------------------------------------->
+<!------------------------------------------------------>
+<!-- FIN Ventana Modal para CREAR Y EDITAR -->
+<!------------------------------------------------------>
+
 
 <!-- Modal para añadir lote -->
 <div class="modal fade" id="addLoteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -104,7 +109,7 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
                     </div>
                     <div class="form-group">
                         <label for="stock">Stock</label>
-                        <input type="text" class="form-control" id="stock">
+                        <input type="number" class="form-control" id="stock" min="1" required>
                     </div>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
@@ -113,6 +118,7 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
         </div>
     </div>
 </div>
+
 
 
 
@@ -163,31 +169,28 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
 <!-------------------------------------------------->
 
 
-
-
+<!------------------------------------------------------>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
+    <!-- Content Header -->
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1><?php echo $titulo_pag;?>
+            <h1><?php echo $titulo_pag; ?>
                 <button class="btn-crear btn bg-gradient-primary btn-sm m-2" data-toggle="modal" data-target="#crear">Crear</button>
             </h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active"><?php echo $titulo_pag;?></li>
+              <li class="breadcrumb-item active"><?php echo $titulo_pag; ?></li>
             </ol>
           </div>
         </div>
-      </div><!-- /.container-fluid -->
+      </div>
     </section>
 	
-    <!------------------ Main content ------------------------------>
-    <!-- ----------------------------------------------------------->
     <!------------------ Main content ------------------------------>
     <section class="content">
       <div class="row">
@@ -198,28 +201,34 @@ if ($_SESSION['id_tipo_us']==1 || $_SESSION['id_tipo_us']==3){
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <table id="tabla" class="table table-bordered table-striped table-hover dataTable dtr-inline" role="grid"></table>
+              <table id="tabla" class="table table-bordered table-striped table-hover dataTable dtr-inline" role="grid">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Concentración</th>
+                        <th>Cantidad</th> <!-- Nueva columna -->
+                        <th>Precio</th>
+                        <th>Laboratorio</th>
+                        <th>Tipo</th>
+                        <th>Presentación</th>
+                        <th>Proveedor</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+              </table>
             </div>
-            <!-- /.card-body -->
         </div>
-        <!-- /.card -->
         </div>
-        <!-- /.col -->
       </div>
-      <!-- /.row -->
       </section>
     <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
-  <?php
+</div>
+
+<?php
 include_once 'layouts/footer.php';
-}
-//Redirecciona al login
-else{
-    header ('location: ../vista/login.php');
+} else {
+    header('location: ../vista/login.php');
 }
 ?>
 <script src="../assets/js/producto.js"></script>
-<!-- /
-<script src="../assets/js/nav.js"></script>
--->

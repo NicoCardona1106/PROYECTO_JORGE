@@ -49,6 +49,7 @@ $(document).ready(function () {
             { "data": "nombre", "title": "Nombre" },
             { "data": "concentracion", "title": "Concentración" },
             { "data": "precio", "title": "Precio" },
+            { "data": "cantidad", "title": "Cantidad" },
             { "data": "laboratorio", "title": "Laboratorio" },
             { "data": "tipo", "title": "Tipo" },
             { "data": "presentacion", "title": "Presentación" },
@@ -208,11 +209,12 @@ $(document).ready(function () {
         funcion = 'buscar';
         $.post('../controlador/ProductoController.php', { dato, funcion }, (response) => {
             const respuesta = JSON.parse(response);
-            $('#id_producto').val(respuesta.id).prop('readonly', true); // Solo lectura
+            $('#id_producto').val(respuesta.id);
             $('#nombre').val(respuesta.nombre);
             $('#concentracion').val(respuesta.concentracion);
             $('#adicional').val(respuesta.adicional);
             $('#precio').val(respuesta.precio);
+            $('#cantidad').val(respuesta.cantidad);
             $('#laboratorio').val(respuesta.laboratorio).trigger('change');
             $('#tipo').val(respuesta.tipo).trigger('change');
             $('#presentacion').val(respuesta.presentacion).trigger('change');
@@ -230,6 +232,7 @@ $(document).ready(function () {
         let concentracion = $('#concentracion').val();
         let adicional = $('#adicional').val();
         let precio = $('#precio').val();
+        let cantidad = $('#cantidad').val();
         let laboratorio = $('#laboratorio').val();
         let tipo = $('#tipo').val();
         let presentacion = $('#presentacion').val();
@@ -238,7 +241,7 @@ $(document).ready(function () {
     
         funcion = edit ? 'editar' : 'crear';
         $.post('../controlador/ProductoController.php', {
-            id, nombre, concentracion, adicional, precio,
+            id, nombre, concentracion, adicional, precio, cantidad,
             laboratorio, tipo, presentacion, avatar, proveedor, funcion
         }, (response) => {
             console.log(response);

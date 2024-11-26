@@ -3,6 +3,40 @@ $(document).ready(function() {
     var datatable;
     var edit = false; // Variable para determinar si estamos editando
 
+    // Listar proveedores
+    function listar() {
+        funcion = 'listar';
+        datatable = $('#tabla').DataTable({
+            "ajax": {
+                "url": "../controlador/ProveedorController.php",
+                "method": "POST",
+                "data": {funcion: funcion}
+            },
+            "columns": [
+                { "data": "id_proveedor" },
+                { "data": "nombre" },
+                { "data": "apellido" }, // Columna para apellido
+                { "data": "dni" }, // Columna para dni
+                { "data": "edad" }, // Columna para edad
+                { "data": "sexo" }, // Columna para sexo
+                { "data": "correo" },
+                { "data": "telefono" },
+                { "data": "direccion" }, // Columna para dirección
+                { "data": "avatar"},
+                {
+                    "defaultContent": "<div class='btn-group'>" +
+                      "<button class='avatar btn bg-teal btn-sm' title='Cambiar imagen' data-toggle='modal' data-target='#cambiaravatar'><i class='fas fa-image'></i></button>" +
+                      "<button class='editar btn btn-sm btn-primary' style='background-color: #005d16; title='Editar' data-toggle='modal' data-target='#crear'><i class='fas fa-pencil-alt'></i></button>" +
+                      "<button class='eliminar btn btn-sm btn-danger' title='Eliminar'><i class='fas fa-trash'></i></button>",
+                    "title": "Acciones"
+                  }
+            ],
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+            }
+        });
+    }
+    
     // Crear proveedor o editar
     $('#form-crear').submit(e => {
         e.preventDefault(); // Prevenir el envío por defecto del formulario
@@ -63,105 +97,109 @@ $(document).ready(function() {
         $('#tit_ven').text('Crear Proveedor'); // Cambia el título de nuevo
     });
 
-    // Función para eliminar proveedores
-    $(document).on('click', '.borrar', function() {
-        let data = datatable.row($(this).parents('tr')).data();
-        let id_proveedor = data.id_proveedor;
-
-        if (confirm("¿Estás seguro de que quieres eliminar este proveedor?")) { // Confirmación antes de eliminar
-            funcion = 'eliminar';
-            $.post('../controlador/ProveedorController.php', {funcion, id_proveedor}, (response) => {
-                if (response == 'deleted') {
-                    $('#delete').show(1000).hide(2000); // Mostrar alerta de eliminación
-                    datatable.ajax.reload(); // Recargar la tabla
-                }
-            });
+    //----------------------------------------------------------
+    // Función que evalúa click en ELIMINAR y obtiene el id
+    //----------------------------------------------------------
+    $(document).on('click', '.eliminar', function () {          
+        let data;
+        if (datatable.row(this).child.isShown()) {
+            // Si el detalle de la fila está visible
+            data = datatable.row(this).data();
+        } else {
+            // Si no, toma los datos de la fila padre
+            data = datatable.row($(this).parents("tr")).data();
         }
-    });
 
-    // Listar proveedores
-    function listar() {
-        funcion = 'listar';
-        datatable = $('#tabla').DataTable({
-            "ajax": {
-                "url": "../controlador/ProveedorController.php",
-                "method": "POST",
-                "data": {funcion: funcion}
-            },
-            "columns": [
-                { "data": "id_proveedor" },
-                { "data": "nombre" },
-                { "data": "apellido" }, // Columna para apellido
-                { "data": "dni" }, // Columna para dni
-                { "data": "edad" }, // Columna para edad
-                { "data": "sexo" }, // Columna para sexo
-                { "data": "correo" },
-                { "data": "telefono" },
-                { "data": "direccion" }, // Columna para dirección
-                { "data": "avatar" }, // Columna para avatar
-                {
-                    "defaultContent": "<div class='btn-group'>" +
-                      "<button class='avatar btn bg-teal btn-sm' title='Cambiar imagen' data-toggle='modal' data-target='#cambiaravatar'><i class='fas fa-image'></i></button>" +
-                      "<button class='editar btn btn-sm btn-primary' style='background-color: #005d16; title='Editar' data-toggle='modal' data-target='#crear'><i class='fas fa-pencil-alt'></i></button>" +
-                      "<button class='eliminar btn btn-sm btn-danger' title='Eliminar'><i class='fas fa-trash'></i></button>",
-                    "title": "Acciones"
-                  }
-            ],
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+        const id = data.id_proveedor; // Captura el ID del proveedor
+        const nombre = data.nombre; // Captura el nombre del proveedor
+
+        // Mostrar alerta de confirmación
+        Swal.fire({
+            title: `¿Está seguro de eliminar a ${nombre}?`,
+            text: "Esta acción no se puede deshacer.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Enviar solicitud al backend para eliminar
+                $.post('../controlador/ProveedorController.php', { funcion: 'eliminar', id: id }, (response) => {
+                    if (response.trim() === 'eliminado') {
+                        Swal.fire(
+                            '¡Eliminado!',
+                            `El proveedor ${nombre} ha sido eliminado.`,
+                            'success'
+                        );
+                        datatable.ajax.reload(null, false); // Recargar tabla
+                    } else {
+                        Swal.fire(
+                            'Error',
+                            `No se pudo eliminar a ${nombre}.`,
+                            'error'
+                        );
+                    }
+                });
             }
         });
-    }
+    });
+
 
     //----------------------------------------------------------
-    // Funcion que evalua click en CAMBIAR LOGO y obtiene el id
+    // Función que evalúa click en CAMBIAR LOGO y obtiene el id
     //----------------------------------------------------------
-    $(document).on('click','.avatar',function(){
-        if(tabla.row(this).child.isShown())
-            var data = tabla.row(this).data();
-        else
-            var data = tabla.row($(this).parents("tr")).data();
-        
-        const id = data.id; //capturo el ID	            
-        //Cargo los objetos ocultos obtenidos con javascript y enviarlos al controlador
-        buscar(id);
-        funcion = 'cambiar_logo';
-        $('#funcion').val(funcion);
+    $(document).on('click', '.avatar', function () {
+        let data;
+        if (datatable.row(this).child.isShown()) {
+            // Si el detalle de la fila está visible, obtén los datos directamente
+            data = datatable.row(this).data();
+        } else {
+            // Si no, obtén los datos de la fila superior
+            data = datatable.row($(this).parents("tr")).data();
+        }
+
+        // Captura el ID del proveedor
+        const id = data.id_proveedor;
+
+        // Actualizar campos del modal de cambio de logo
+        $('#id_avatar').val(id); // Asigna el ID del proveedor al campo oculto
+        $('#nombre_avatar').html(data.nombre); // Muestra el nombre del proveedor en el modal
+        $('#avataractual').attr('src', `../assets/img/proveedor/${data.avatar}`); // Ruta actual del avatar
+        $('#funcion').val('cambiar_logo'); // Define la función para el controlador
     });
-    
+
     //----------------------------------------------------------
     // Click en submit Cambiar logo
     //---------------------------------------------------------
-    $('#form-logo').submit(e=>{
-        let formData = new FormData($('#form-logo')[0]);
-        $.ajax({
-            url:'../controlador/ProveedorController.php',
-            type:'POST',
-            data:formData,
-            cache:false,
-            processData:false,
-            contentType:false
-        }).done(function(response){
+    $('#form-logo').submit(e => {
+        e.preventDefault(); // Evitar el envío normal del formulario
 
-            console.log(response);
-            const json= JSON.parse(response);
-            if(json.alert == 'editalogo'){
-                $('#avataractual').attr('src',json.ruta);
-                $('#updatelogo').hide('slow');
-                $('#updatelogo').show(1000);
-                $('#updatelogo').hide(2000);
-                //$('#form-logo').trigger('reset');
-                buscar_todos();
-            }
-            else{
-                $('#noupdatelogo').hide('slow');
-                $('#noupdatelogo').show(1000);
-                $('#noupdatelogo').hide(2000);
-                //$('#form-logo').trigger('reset');
+        let formData = new FormData($('#form-logo')[0]); // Crear objeto FormData
+        $.ajax({
+            url: '../controlador/ProveedorController.php', // URL del controlador
+            type: 'POST',
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false
+        }).done(function (response) {
+            console.log(response); // Depuración
+
+            const json = JSON.parse(response);
+            if (json.alert === 'editalogo') {
+                // Actualizar la imagen en el modal y en la tabla
+                $('#avataractual').attr('src', `../assets/img/proveedor/${json.ruta.split('/').pop()}`);
+                $('#updatelogo').hide('slow').show(1000).hide(2000);
+
+                // Opcional: recargar la tabla para reflejar los cambios
+                datatable.ajax.reload(null, false);
+            } else {
+                $('#noupdatelogo').hide('slow').show(1000).hide(2000);
             }
         });
-        e.preventDefault();
     });
-    
-    listar(); // Llamada a la función para listar proveedores
+
+        listar(); // Llamada a la función para listar proveedores
 });

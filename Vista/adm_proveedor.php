@@ -28,9 +28,6 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
                 <div class="alert alert-success text-center" id="edit" style='display:none;'>
                     <i class="fa fa-check-circle m-1"> Proveedor editado correctamente</i>
                 </div>
-                <div class="alert alert-success text-center" id="delete" style='display:none;'>
-                    <i class="fa fa-check-circle m-1"> Proveedor eliminado correctamente</i>
-                </div>
                 <form id="form-crear">
                     <input type="hidden" id="id"> <!-- Campo oculto para almacenar el ID del proveedor -->
                     <div class="form-group">
@@ -46,8 +43,8 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
                         <input type="text" id="dni" class="form-control" placeholder="Ingrese DNI" required>
                     </div>
                     <div class="form-group">
-                        <label for="edad">Edad</label>
-                        <input type="date" id="edad" class="form-control" placeholder="Ingrese edad" required>
+                        <label for="edad">Fecha De Nacimiento</label>
+                        <input type="date" class="form-control" id="edad" name="edad" placeholder="Ingrese la edad" required>
                     </div>
                     <div class="form-group">
                         <label for="sexo">Sexo</label>
@@ -64,11 +61,11 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
                     </div>
                     <div class="form-group">
                         <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" class="form-control" placeholder="Ingrese teléfono">
+                        <input type="number" id="telefono" class="form-control" placeholder="Ingrese teléfono" min="1" required>
                     </div>
                     <div class="form-group">
                         <label for="direccion">Dirección</label>
-                        <input type="text" id="direccion" class="form-control" placeholder="Ingrese dirección">
+                        <input type="text" id="direccion" class="form-control" placeholder="Ingrese dirección" required>
                     </div>
                     <div class="form-group">
                         <label for="avatar">Avatar</label>
@@ -98,7 +95,7 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
             </div>
             <div class="modal-body">
                 <div class="text-center">
-                    <img id="avataractual" src="" class="profile-user-img img-fluid img-circle">
+                    <img id="avataractual" src="" class="profile-user-img img-fluid img-circle" alt="Avatar del proveedor">
                 </div>
                 <div class="alert alert-success text-center" id="updatelogo" style='display:none;'>
                     <i class="fa fa-check-circle m-1"> Imagen cambiada correctamente</i>
@@ -126,67 +123,62 @@ if ($_SESSION['id_tipo_us'] == 1 || $_SESSION['id_tipo_us'] == 3) {
 <!--   Tabla para listar los proveedores                  -->
 <!-------------------------------------------------------> 
 <div class="content-wrapper">
-    <div class="container-fluid"> <!-- Añadido contenedor para mantener el contenido centrado y alineado -->
-        <section class="content-header">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1><?php echo $titulo_pag; ?>
-                        <button class="btn-crear btn bg-gradient-primary btn-sm m-2" data-toggle="modal" data-target="#crear">Crear</button>
-                    </h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active"><?php echo $titulo_pag; ?></li>
-                    </ol>
-                </div>
+    <section class="content-header">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1><?php echo $titulo_pag; ?>
+                    <button class="btn-crear btn bg-gradient-primary btn-sm m-2" data-toggle="modal" data-target="#crear">Crear</button>
+                </h1>
             </div>
-        </section>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active"><?php echo $titulo_pag; ?></li>
+                </ol>
+            </div>
+        </div>
+    </section>
 
-        <!------------------ Main content ------------------------------> 
-        <section class="content">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title">Proveedores</h3>
-                        </div>
-                        <div class="card-body">
-                            <table id="tabla" class="table table-bordered table-striped table-hover dataTable dtr-inline" role="grid">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Nombre</th>
-                                        <th>Apellido</th>
-                                        <th>DNI</th>
-                                        <th>Edad</th>
-                                        <th>Sexo</th>
-                                        <th>Correo</th>
-                                        <th>Teléfono</th>
-                                        <th>Dirección</th>
-                                        <th>Avatar</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Los registros se generarán dinámicamente aquí -->
-                                </tbody>
-                            </table>
-                        </div>
+    <section class="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Proveedores</h3>
+                    </div>
+                    <div class="card-body">
+                        <table id="tabla" class="table table-bordered table-striped table-hover dataTable dtr-inline" role="grid">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>DNI</th>
+                                    <th>Fecha De Nacimiento</th>
+                                    <th>Sexo</th>
+                                    <th>Correo</th>
+                                    <th>Teléfono</th>
+                                    <th>Dirección</th>
+                                    <th>Avatar</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los registros se generarán dinámicamente aquí -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        </section>
-    </div> <!-- /.container-fluid -->
+        </div>
+    </section>
 </div>
 
 <?php
     include_once 'layouts/footer.php';
 } else {
-    // Redirecciona al login si no tiene los permisos adecuados
     header('location: ../Vista/login.php');
 }
 ?>
 
-<!-- Asegúrate de que se cargue correctamente el archivo JavaScript -->
 <script src="../assets/js/proveedor.js"></script>

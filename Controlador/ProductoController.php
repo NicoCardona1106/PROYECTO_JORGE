@@ -20,6 +20,7 @@ $producto = new Producto();
                     'concentracion' => $objeto->concentracion,
                     'adicional' => $objeto->adicional,
                     'precio' => $objeto->precio,
+                    'cantidad' => $objeto->cantidad, // Agregado
                     'laboratorio' => $objeto->laboratorio,
                     'tipo' => $objeto->tipo,
                     'presentacion' => $objeto->presentacion,
@@ -46,6 +47,7 @@ $producto = new Producto();
                 'concentracion' => $objeto->concentracion,
                 'adicional' => $objeto->adicional,
                 'precio' => $objeto->precio,
+                'cantidad' => $objeto->cantidad, // Agregado
                 'laboratorio' => $objeto->laboratorio,
                 'tipo' => $objeto->tipo,
                 'presentacion' => $objeto->presentacion,
@@ -56,33 +58,34 @@ $producto = new Producto();
         $jsonstring = json_encode($json);
         echo $jsonstring;
     }
-
+    
     
 
     //-------------------------------------------------------------------
     // Funcion para buscar un producto
     //-------------------------------------------------------------------
-    if ($_POST['funcion'] == 'buscar'){
+    if ($_POST['funcion'] == 'buscar') {
         $json = Array();
-        // Llamado al controlador
         $producto->Buscar($_POST['dato']);
         foreach ($producto->objetos as $objeto) {
-            $json[]=array(
-                'id'=>$objeto->id_producto,
-                'nombre'=>$objeto->nombre,
-                'concentracion'=>$objeto->concentracion,
-                'adicional'=>$objeto->adicional,
-                'precio'=>$objeto->precio,
-                'laboratorio'=>$objeto->id_laboratorio,
-                'tipo'=>$objeto->id_tip_prod,
-                'presentacion'=>$objeto->id_presentacion,
-                'avatar'=>$objeto->avatar,
-                'proveedor'=>$objeto->id_proveedor
+            $json[] = array(
+                'id' => $objeto->id_producto,
+                'nombre' => $objeto->nombre,
+                'concentracion' => $objeto->concentracion,
+                'adicional' => $objeto->adicional,
+                'precio' => $objeto->precio,
+                'cantidad' => $objeto->cantidad, // Agregado
+                'laboratorio' => $objeto->id_laboratorio,
+                'tipo' => $objeto->id_tip_prod,
+                'presentacion' => $objeto->id_presentacion,
+                'avatar' => $objeto->avatar,
+                'proveedor' => $objeto->id_proveedor
             );
         }
         $jsonstring = json_encode($json[0]);
         echo $jsonstring;
     }
+    
     
     //-------------------------------------------------------------------
     // Funcion Crear
@@ -93,11 +96,12 @@ $producto = new Producto();
         $concentracion = $_POST['concentracion'];
         $adicional = $_POST['adicional'];
         $precio = $_POST['precio'];
+        $cantidad = $_POST['cantidad']; // Nuevo campo
         $laboratorio = $_POST['laboratorio'];
         $tipo = $_POST['tipo'];
         $presentacion = $_POST['presentacion'];
         $avatar = 'default.png';
-        $proveedor = $_POST['proveedor']; // Asegúrate de que esta clave existe
+        $proveedor = $_POST['proveedor']; // Asegúrate de que esta clave exista
     
         if (!isset($proveedor)) {
             echo "Error: Proveedor no definido.";
@@ -105,19 +109,22 @@ $producto = new Producto();
         }
     
         $producto->Crear(
-            $id, $nombre, $concentracion, $adicional, $precio,
+            $id, $nombre, $concentracion, $adicional, $precio, $cantidad,
             $laboratorio, $tipo, $presentacion, $avatar, $proveedor
         );
     }
     
     
+    
     //-------------------------------------------------------------------
     // Funcion Editar
     //-------------------------------------------------------------------
-    if ($_POST['funcion'] == 'editar'){
-        $producto->Editar($_POST['id'], $_POST['nombre'], $_POST['concentracion'],
-                          $_POST['adicional'], $_POST['precio'], $_POST['laboratorio'],
-                          $_POST['tipo'], $_POST['presentacion'], $_POST['proveedor']); // Añadimos el proveedor
+    if ($_POST['funcion'] == 'editar') {
+        $producto->Editar(
+            $_POST['id'], $_POST['nombre'], $_POST['concentracion'], $_POST['adicional'],
+            $_POST['precio'], $_POST['cantidad'], $_POST['laboratorio'],
+            $_POST['tipo'], $_POST['presentacion'], $_POST['proveedor']
+        );
     }
     
 
@@ -191,8 +198,19 @@ $producto = new Producto();
         var_dump($nuevoId); // Verifica el valor devuelto
         echo json_encode(['nuevoId' => $nuevoId]);
     }
-    
-    
 
+    
+    //-------------------------------------------------------------------
+    // Funcion para listar Productos con descuento
+    //-------------------------------------------------------------------  
+
+    if ($_POST['funcion'] == 'listar_descuentos') {
+        $productos = $producto->obtenerProductosConDescuento();
+        if (!empty($productos)) {
+            echo json_encode(['status' => 'success', 'data' => $productos]);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No hay productos con descuento disponibles.']);
+        }
+    }
 
 ?>

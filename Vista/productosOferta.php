@@ -1,7 +1,7 @@
 <?php
 session_start();
 if ($_SESSION['id_tipo_us'] == 2) {
-  $titulo_pag = 'Bienvenido a la sección de productos';
+  $titulo_pag = 'Estas son las ofertas que tenemos para ti';
   include_once 'layouts/header.php';
   include_once 'layouts/navCliente.php';
 ?>
@@ -29,6 +29,7 @@ if ($_SESSION['id_tipo_us'] == 2) {
         <div class="card card-secondary">
           <div class="container">
             <div id="productos" class="row"> <!-- Aquí se cargarán las tarjetas de productos -->
+              <!-- Las tarjetas de productos serán inyectadas dinámicamente por el archivo JS -->
             </div>
           </div>
         </div>
@@ -64,6 +65,14 @@ if ($_SESSION['id_tipo_us'] == 2) {
             <input type="text" class="form-control" id="productoPrecio" disabled>
           </div>
           <div class="form-group">
+            <label for="productoTipoDescuento">Tipo de Descuento</label>
+            <input type="text" class="form-control" id="productoTipoDescuento" disabled>
+          </div>
+          <div class="form-group">
+            <label for="productoDescuento">Porcentaje de Descuento</label>
+            <input type="text" class="form-control" id="productoDescuento" disabled>
+          </div>
+          <div class="form-group">
             <label for="productoDescripcion">Descripción</label>
             <textarea class="form-control" id="productoDescripcion" rows="3" disabled></textarea>
           </div>
@@ -81,4 +90,4 @@ if ($_SESSION['id_tipo_us'] == 2) {
 }
 ?>
 
-<script src="../assets/js/Productos.js"></script>
+<script src="../assets/js/ProductosOferta.js"></script>

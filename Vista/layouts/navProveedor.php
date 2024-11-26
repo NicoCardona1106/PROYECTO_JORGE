@@ -62,7 +62,7 @@
           </li>
           <!-- Historial de Ventas -->
           <li class="nav-item">
-            <a href="historial_ventas.php" class="nav-link">
+            <a href="HistorialV.php" class="nav-link">
               <i class="nav-icon fas fa-history"></i>
               <p>Historial de Ventas</p>
             </a>
